@@ -1,0 +1,36 @@
+<html>
+<head></head>
+<body onload="InitThis();">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/static/js/drawing.js"></script>
+    <div align="center">
+        <canvas id="myCanvas" width="578" height="200"></canvas>
+        <script>
+            var canvas = document.getElementById('myCanvas');
+            var context = canvas.getContext('2d');
+
+            // begin custom shape
+            context.beginPath();
+            context.moveTo(170, 80);
+            context.bezierCurveTo(130, 100, 130, 150, 230, 150);
+            context.bezierCurveTo(250, 180, 320, 180, 340, 150);
+            context.bezierCurveTo(420, 150, 420, 120, 390, 100);
+            context.bezierCurveTo(430, 40, 370, 30, 340, 50);
+            context.bezierCurveTo(320, 5, 250, 20, 250, 50);
+            context.bezierCurveTo(200, 5, 150, 20, 170, 80);
+
+            // complete custom shape
+            context.closePath();
+            context.lineWidth = 5;
+            context.fillStyle = '#8ED6FF';
+            context.fill();
+            context.strokeStyle = 'blue';
+            context.stroke();
+        </script>
+    </div>
+    <a id="link" onclick="putImage()">Save as Image</a>
+    <!--<div id="createPNGButton">-->
+        <!--<button onclick="putImage()">Save as Image</button>-->
+    <!--</div>-->
+</body>
+</html>
