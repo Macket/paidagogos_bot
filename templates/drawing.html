@@ -5,7 +5,7 @@
     <script type="text/javascript" src="/static/js/drawing.js"></script>
     <script type="text/javascript" src="/static/js/imagePlacing.js"></script>
     <div align="center" style="cursor: url('/static/img/pencil.ico'),auto;">
-        <canvas id="myCanvas" width="1000" height="1100"></canvas>
+        <canvas id="myCanvas" width="1000" height="1000"></canvas>
     </div>
     <div style="position: fixed; top: 20px; left: 20px" >
         <br /><br />
@@ -31,5 +31,9 @@
     <div id="createPNGButton" style="position: fixed; top: 20px; right: 20px">
         <button onclick="putImage()">Done</button>
     </div>
+
+    <!-- Context for JS -->
+    <div id="fileId" style="visibility: hidden">{{ file_id }}</div>
+    <div id="fileExtension" style="visibility: hidden">{{ file_extension }}</div>
 </body>
 </html>

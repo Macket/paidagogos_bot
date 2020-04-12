@@ -70,13 +70,16 @@ function clearArea() {
 }
 
 function putImage() {
+    var fileId = document.getElementById('fileId').innerHTML;
+    var fileExtension = document.getElementById('fileExtension').innerHTML;
     var dataURL = canvas.toDataURL('image/png');
     console.log(dataURL);
     $.ajax({
       type: "POST",
-      url: "upload/",
+      url: "/drawer/",
       data: {
-         imgBase64: dataURL
+          imgBase64: dataURL,
+          filename: 'static/media/' + fileId + '-checked.' + fileExtension,
       }
     }).done(function(o) {
       console.log('saved');

@@ -37,7 +37,9 @@ function placeImage() {
     var imageObj = new Image();
 
 
-    imageObj.src = '/static/img/dino.jpg';
+    var fileId = document.getElementById('fileId').innerHTML;
+    var fileExtension = document.getElementById('fileExtension').innerHTML;
+    imageObj.src = '/static/media/' + fileId + '.' + fileExtension;
 
     imageObj.onload = function() {
         fitImageOn(canvas, context, imageObj)
