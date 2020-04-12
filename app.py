@@ -48,13 +48,12 @@ def drawer():
         image_str = data['imgBase64']
         filename = data['filename']
         fileId = data['fileId']
-        # image_bytes = base64.b64decode(image_str[image_str.index(';base64,') + 8:])
-        # with open(filename, 'wb') as f:
-        #     f.write(image_bytes)
+        image_bytes = base64.b64decode(image_str[image_str.index(';base64,') + 8:])
+        with open(filename, 'wb') as f:
+            f.write(image_bytes)
         photo = open(filename, 'rb')
 
         student_id = Photo.get(fileId).student_id
-        print('STUDENT')
         print(student_id)
 
         bot.send_photo(student_id, photo)
