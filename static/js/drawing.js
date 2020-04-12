@@ -27,10 +27,11 @@ function InitThis() {
     });
 
     // const image = new Image(60, 45); // Using optional size for image
+
     // image.onload = drawImageActualSize; // Draw when image has loaded
     //
     // // Load an image of intrinsic size 300x227 in CSS pixels
-    // image.src = 'https://mdn.mozillademos.org/files/5397/rhino.jpg';
+    // image.src = '/static/img/dino.jpg';
     //
     // function drawImageActualSize() {
     //   // Will draw the image as 300x227, ignoring the custom size of 60x45
@@ -49,6 +50,10 @@ function Draw(x, y, isDown) {
         ctx.beginPath();
         ctx.strokeStyle = $('#selColor').val();
         ctx.lineWidth = $('#selWidth').val();
+        if ($('#selColor').val() === "rgba(255,255,255,0)") {
+            console.log($('#selColor').val());
+            ctx.globalCompositeOperation = "destination-out";
+        }
         ctx.lineJoin = "round";
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(x, y);
@@ -65,7 +70,7 @@ function clearArea() {
 }
 
 function putImage() {
-    var dataURL = canvas.toDataURL();
+    var dataURL = canvas.toDataURL('image/png');
     console.log(dataURL);
     $.ajax({
       type: "POST",

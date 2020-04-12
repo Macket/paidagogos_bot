@@ -1,7 +1,5 @@
-# dependencies
 node_modules/
-
-# production
 .idea
 .pyc
 __pycache__/
+.env
