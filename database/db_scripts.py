@@ -44,7 +44,7 @@ def init_database():
         # commands = [DROP_PHOTOS_TABLE, DROP_STUDENTS_TABLE, DROP_CLASSROOMS_TABLE, DROP_USERS_TABLE,
         #             CREATE_USERS_TABLE, CREATE_CLASSROOMS_TABLE, CREATE_STUDENTS_TABLE, CREATE_PHOTOS_TABLE]
     else:
-        commands = [CREATE_USERS_TABLE, CREATE_CLASSROOMS_TABLE, CREATE_STUDENTS_TABLE]
+        commands = [CREATE_USERS_TABLE, CREATE_CLASSROOMS_TABLE, CREATE_STUDENTS_TABLE, CREATE_PHOTOS_TABLE]
     for command in commands:
         execute_database_command(command)
     print('bot has been started')
