@@ -10,7 +10,7 @@ def get_drawer_markup(file_id, file_path):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&file_path={file_path}' if settings.DEBUG \
-        else f'https://127.0.0.1:5000/drawer/?file_id={file_id}&file_path={file_path}'  # TODO
+        else f'https://remote-homework.herokuapp.com//drawer/?file_id={file_id}&file_path={file_path}'
     inline_markup.add(
         types.InlineKeyboardButton(text='Make notes', url=url),
     )

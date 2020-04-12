@@ -89,7 +89,7 @@ def classroom_receive(message):
     classroom = Classroom(user.id, message.text).save()
 
     url = f'https://t.me/BotoKatalabot?start=slug_{classroom.slug}' if settings.DEBUG \
-        else f'https://t.me/remote_homework_bot?start=slug_{classroom.slug}'
+        else f'https://t.me/remote_learning_bot?start=slug_{classroom.slug}'
 
     ru_text = f""
     en_text = f"Here is your classroom link: {url}\n\n Share it with your students"
@@ -120,20 +120,3 @@ def student_fullname_receive(message):
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text)
-
-
-# def get_judge_markup(user_id, habit_id):
-#     user = User.get(user_id)
-#     ru_button = 'Стать судьёй'
-#     en_button = 'Become the judge'
-#     button = ru_button if user.language_code == 'ru' else en_button
-#
-#     inline_markup = types.InlineKeyboardMarkup(row_width=1)
-#
-#     url = f'https://t.me/BotoKatalabot?start=judge_{habit_id}' if settings.DEBUG \
-#         else f'https://t.me/inspector_habit_bot?start=judge_{habit_id}'
-#     inline_markup.add(
-#         types.InlineKeyboardButton(text=button, url=url),
-#     )
-#
-#     return inline_markup
