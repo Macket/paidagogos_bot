@@ -80,6 +80,7 @@ function putImage() {
       data: {
           imgBase64: dataURL,
           filename: 'static/media/' + fileId + '-checked.' + fileExtension,
+          fileId: fileId,
       }
     }).done(function(o) {
       console.log('saved');

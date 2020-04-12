@@ -3,11 +3,17 @@ from flask import render_template
 from flask import request
 import time
 from bot import bot
-import test
+import users.intro
+import users.photos
+from classrooms.models import Photo
 import base64
 import threading
 import requests
 import settings
+from database.db_scripts import init_database
+
+
+init_database()
 
 
 app = Flask(__name__,
@@ -41,14 +47,17 @@ def drawer():
         data = request.values.to_dict()
         image_str = data['imgBase64']
         filename = data['filename']
-        image_bytes = base64.b64decode(image_str[image_str.index(';base64,') + 8:])
-        print(image_bytes)
-        with open(filename, 'wb') as f:
-            f.write(image_bytes)
+        fileId = data['fileId']
+        # image_bytes = base64.b64decode(image_str[image_str.index(';base64,') + 8:])
+        # with open(filename, 'wb') as f:
+        #     f.write(image_bytes)
         photo = open(filename, 'rb')
-        print(photo)
-        bot.send_message(settings.ADMIN_ID, 'Nice')
-        bot.send_photo(settings.ADMIN_ID, photo)
+
+        student_id = Photo.get(fileId).student_id
+        print('STUDENT')
+        print(student_id)
+
+        bot.send_photo(student_id, photo)
 
         return 'ok'
 
