@@ -21,11 +21,10 @@ def get_drawer_markup(file_id, file_path):
 @bot.message_handler(content_types=['photo'])
 def new_photo(message):
     student = Student.get(message.chat.id)
-    print('SOMETHING!!!')
     if student:
         file_info = bot.get_file(message.photo[2].file_id)
         teacher = User.get(Classroom.get(student.classroom_id).teacher_id)
         Photo(file_info.file_id, student.id, teacher.id).save()
 
         bot.send_photo(teacher.id, file_info.file_id)
-        bot.send_message(teacher.id, f'Homework from Nastya. Click this button to make some notes', reply_markup=get_drawer_markup(file_info.file_id, file_info.file_path))
+        # bot.send_message(teacher.id, f'Homework from Nastya. Click this button to make some notes', reply_markup=get_drawer_markup(file_info.file_id, file_info.file_path))
