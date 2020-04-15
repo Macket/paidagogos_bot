@@ -1,28 +1,32 @@
 from telebot import types
-# from users.data import preparing_habits
-from users.models import User
-# import settings
+from users.models import Teacher
 
 
-def get_role_markup(user_id):
-    user = User.get(user_id)
-    ru_markup = types.ReplyKeyboardMarkup(row_width=1)
-    ru_markup.add(
-        types.KeyboardButton('Ученик'),
-        types.KeyboardButton('Учитель'),
-    )
-    en_markup = types.ReplyKeyboardMarkup(row_width=1)
-    en_markup.add(
-        types.KeyboardButton('Student'),
-        types.KeyboardButton('Teacher'),
-    )
-    markup = ru_markup if user.language_code == 'ru' else en_markup
+def get_classrooms_inline_markup(user):
+    inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
-    return markup
+    for classroom in user.get_classrooms():
+        inline_markup.add(
+            types.InlineKeyboardButton(
+                text=classroom.name if type(user) is Teacher else
+                f"{classroom.name} ({Teacher.get(classroom.teacher_id).fullname})",
+                callback_data='@@CLASSROOMS/{"classroom_id": ' + str(classroom.id) + '"}'
+            )
+        )
+
+    if type(user) is Teacher:
+        inline_markup.add(
+            types.InlineKeyboardButton(
+                text=f"🆕 {'Новый класс' if user.language_code == 'ru' else 'New class'}",
+                callback_data="@@NEW_CLASS/{}"
+            )
+        )
+
+    return inline_markup
 
 
 # def get_cancel_markup(user_id):
-#     user = User.get(user_id)
+#     user = Teacher.get(user_id)
 #     ru_markup = types.ReplyKeyboardMarkup()
 #     ru_markup.add(types.KeyboardButton('❌ Отмена'))
 #     en_markup = types.ReplyKeyboardMarkup()
@@ -33,7 +37,7 @@ def get_role_markup(user_id):
 #
 #
 # def get_habits_markup(user_id):
-#     user = User.get(user_id)
+#     user = Teacher.get(user_id)
 #
 #     ru_markup = types.ReplyKeyboardMarkup(row_width=1)
 #     ru_markup.add(

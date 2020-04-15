@@ -1,5 +1,6 @@
 import time
 from bot import bot
+from users import intro
 from database.db_scripts import init_database
 
 init_database()

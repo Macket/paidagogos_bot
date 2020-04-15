@@ -1,6 +1,6 @@
 from telebot import types
 from bot import bot
-from users.models import Student, User
+from users.models import Student, Teacher
 from classrooms.models import Classroom, Photo
 import settings
 
@@ -23,7 +23,7 @@ def new_photo(message):
     student = Student.get(message.chat.id)
     if student:
         file_info = bot.get_file(message.photo[2].file_id)
-        teacher = User.get(Classroom.get(student.classroom_id).teacher_id)
+        teacher = Teacher.get(Classroom.get(student.classroom_id).teacher_id)
         Photo(file_info.file_id, student.id, teacher.id).save()
 
         bot.send_photo(teacher.id, file_info.file_id)

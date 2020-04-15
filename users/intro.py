@@ -1,109 +1,120 @@
 # from telebot import types
 from bot import bot
-from users.models import User, Student
-from classrooms.models import Classroom
+from users.models import Teacher, Student
+from users import markups as user_markups
+from classrooms.models import Classroom, ClassroomStudent
+from datetime import datetime, timezone
 import settings
-# from datetime import datetime
-# from tzwhere import tzwhere
-# import re
-# import pytz
-import users.markups as markups
-# from users.utils import get_schedule, get_user_naming
-# from checks.models import Check
-# from habits.models import Habit
-# from users.data import preparing_habits
-from users.roles import Roles
 
 
 @bot.message_handler(commands=['start'])
-def role_request(message):
+def start(message):
     classroom_slug = message.text[12:] if message.text[7:] else None
     if classroom_slug:
-        classroom = Classroom.get_by_slug(classroom_slug)
-        student = Student(message.chat.id, classroom.id, language_code='en')
-        student.save()
-        student_fullname_request(message)
+        teacher = Teacher.get(message.chat.id)
+        if teacher:
+            ru_text = "Вы уже зарегистрированы как учитель и не можете добавляться в классы"
+            en_text = ""
+            text = ru_text if teacher.language_code == 'ru' else en_text
+
+            bot.send_message(message.chat.id, text)
+            bot.send_message(message.chat.id, "Классные комнаты",
+                             reply_markup=user_markups.get_classrooms_inline_markup(teacher))
+        else:
+            student = Student.get(message.chat.id) or \
+                      Student(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
+            classroom = Classroom.get_by_slug(classroom_slug)
+            teacher = Teacher.get(classroom.teacher_id)
+            ClassroomStudent(classroom.id, student.id, joined_utc=datetime.now(timezone.utc)).save()  # TODO исключить дублирование
+            if not student.fullname:
+                student_fullname_request(message)
+            else:
+                ru_text = f"Вы добавлены в классную комнату: *{classroom.name}*. Учитель: _{teacher.fullname}_"
+                en_text = f""
+                text = ru_text if student.language_code == 'ru' else en_text
+
+                bot.send_message(message.chat.id, text, parse_mode='Markdown')
+                bot.send_message(message.chat.id, 'Классные комнаты',
+                                 reply_markup=user_markups.get_classrooms_inline_markup(student))
     else:
-        # user = User(message.chat.id, language_code=message.from_user.language_code)
-        user = User(message.chat.id, language_code='en', role=Roles.TEACHER.value)
-        user.save()
-        fullname_request(message)
+        student = Student.get(message.chat.id)
+        if student:
+            ru_text = "Вы уже зарегистрированы как ученик"
+            en_text = ""
+            text = ru_text if student.language_code == 'ru' else en_text
+
+            bot.send_message(message.chat.id, text)
+            bot.send_message(message.chat.id, 'Классные комнаты',
+                             reply_markup=user_markups.get_classrooms_inline_markup(student))
+        else:
+            # teacher = Teacher(message.chat.id, language_code=message.from_user.language_code)
+            Teacher(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
+            teacher_fullname_request(message)
 
 
-def fullname_request(message):
-    print('REQUEST')
-    user = User.get(message.chat.id)
+def teacher_fullname_request(message):
+    teacher = Teacher.get(message.chat.id)
 
-    ru_text = f''
+    ru_text = f"Введите своё полное имя. Его будут видеть ваши ученики."
     en_text = f"What is your full name?"
-    text = ru_text if user.language_code == 'ru' else en_text
+    text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text)
-    bot.register_next_step_handler(message, fullname_receive)
+    bot.register_next_step_handler(message, teacher_fullname_receive)
 
 
-def fullname_receive(message):
-    user = User.get(message.chat.id)
+def teacher_fullname_receive(message):
+    teacher = Teacher.get(message.chat.id)
 
-    user.fullname = message.text
-    user.save()
+    teacher.fullname = message.text
+    print(teacher.fullname)
+    teacher.save()
 
     classroom_request(message)
 
 
-# def role_request(message):
-#     user = User.get(message.chat.id)
-#
-#     ru_text = f""
-#     en_text = f"Choose your role"
-#     text = ru_text if user.language_code == 'ru' else en_text
-#
-#     bot.send_message(message.chat.id, text, reply_markup=markups.get_role_markup(message.chat.id))
-#     bot.register_next_step_handler(message, role_receive)
-#
-#
-# def role_receive(message):
-#     user = User.get(message.chat.id)
-#
-#     user.f = Roles.TEACHER.value if message.text in ['Student', 'Учитель'] else Roles.STUDENT.value
-#     user.save()
-#
-#     classroom_request(message)
-
-
 def classroom_request(message):
-    user = User.get(message.chat.id)
+    teacher = Teacher.get(message.chat.id)
 
-    ru_text = f""
+    ru_text = f"Напиши название класса. Например, «*7Б класс. Математика*». " \
+              f"Не беспокойтесь об офциальном названии, просто дайте такое имя, " \
+              f"которое будет понятно вашим ученикам."
     en_text = f"Write your classroom name. Don't worry about " \
               f"its official name. Just enter a name that students will understand."
-    text = ru_text if user.language_code == 'ru' else en_text
+    text = ru_text if teacher.language_code == 'ru' else en_text
 
-    bot.send_message(message.chat.id, text)
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
     bot.register_next_step_handler(message, classroom_receive)
 
 
 def classroom_receive(message):
-    user = User.get(message.chat.id)
+    teacher = Teacher.get(message.chat.id)
+    classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
 
-    classroom = Classroom(user.id, message.text).save()
+    url = f'https://t.me/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
+        else f'https://t.me/remote_learning_bot?start=slug-{classroom.slug}'
 
-    url = f'https://t.me/BotoKatalabot?start=slug_{classroom.slug}' if settings.DEBUG \
-        else f'https://t.me/remote_learning_bot?start=slug_{classroom.slug}'
+    ru_text = f"Вот ссылка на вашу классную комнату:\n\n" \
+              f"*{classroom.name}*. Учитель: _{teacher.fullname}_\n{url}\n\n" \
+              f"Отправьте её своим ученикам. Пройдя по ней и нажав команду *ЗАПУСТИТЬ*, " \
+              f"они сразу попадут в вашу классную комнату."
+    en_text = f"Here is your classroom link: \n\n Share it with your students"
+    text = ru_text if teacher.language_code == 'ru' else en_text
 
-    ru_text = f""
-    en_text = f"Here is your classroom link: {url}\n\n Share it with your students"
-    text = ru_text if user.language_code == 'ru' else en_text
-
-    bot.send_message(message.chat.id, text)
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(message.chat.id, "Классные комнаты",
+                     reply_markup=user_markups.get_classrooms_inline_markup(teacher))
 
 
 def student_fullname_request(message):
+    print('REQUEST')
     student = Student.get(message.chat.id)
+    print('IDDD', student.id)
 
-    ru_text = f''
-    en_text = f"What is your full name?"
+    ru_text = "Введите своё полное имя. Его будут видеть ваши учителя."
+    en_text = "What is your full name?"
     text = ru_text if student.language_code == 'ru' else en_text
+    print(text)
 
     bot.send_message(message.chat.id, text)
     bot.register_next_step_handler(message, student_fullname_receive)
@@ -115,8 +126,13 @@ def student_fullname_receive(message):
     student.fullname = message.text
     student.save()
 
-    ru_text = f''
-    en_text = f"Send me photos of your homework, I'll forward them to your teacher and come back with feedback"
+    classroom = student.get_classrooms()[-1]
+    teacher = Teacher.get(classroom.teacher_id)
+
+    ru_text = f"Вы добавлены в классную комнату: *{classroom.name}*. Учитель: _{teacher.fullname}_"
+    en_text = ""
     text = ru_text if student.language_code == 'ru' else en_text
 
-    bot.send_message(message.chat.id, text)
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(message.chat.id, 'Классные комнаты',
+                     reply_markup=user_markups.get_classrooms_inline_markup(student))

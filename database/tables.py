@@ -1,19 +1,30 @@
-DROP_USERS_TABLE = """
-       DROP TABLE users;
-"""
-
 # id == telegram_id
-CREATE_USERS_TABLE = """
-       CREATE TABLE users (
+CREATE_TEACHERS_TABLE = """
+       CREATE TABLE teachers (
            id BIGINT PRIMARY KEY,
            fullname VARCHAR(255),
-           role VARCHAR(15),
-           language_code VARCHAR(15)
+           language_code VARCHAR(15),
+           registered_utc TIMESTAMP
        )
        """
 
-DROP_CLASSROOMS_TABLE = """
-       DROP TABLE classrooms;
+DROP_TEACHERS_TABLE = """
+       DROP TABLE teachers;
+"""
+
+
+# id == telegram_id
+CREATE_STUDENTS_TABLE = """
+       CREATE TABLE students (
+           id BIGINT PRIMARY KEY,
+           fullname VARCHAR(255),
+           language_code VARCHAR(15),
+           registered_utc TIMESTAMP
+       )
+       """
+
+DROP_STUDENTS_TABLE = """
+       DROP TABLE students;
 """
 
 CREATE_CLASSROOMS_TABLE = """
@@ -22,40 +33,29 @@ CREATE_CLASSROOMS_TABLE = """
            teacher_id BIGINT,
            name VARCHAR(255),
            slug VARCHAR(63),
-           FOREIGN KEY (teacher_id) REFERENCES users (id) ON DELETE CASCADE 
+           created_utc TIMESTAMP,
+           FOREIGN KEY (teacher_id) REFERENCES teachers (id) ON DELETE CASCADE 
        )
        """
 
-DROP_STUDENTS_TABLE = """
-       DROP TABLE students;
+DROP_CLASSROOMS_TABLE = """
+       DROP TABLE classrooms;
 """
 
-# id == telegram_id
-CREATE_STUDENTS_TABLE = """
-       CREATE TABLE students (
-           id BIGINT PRIMARY KEY,
-           classroom_id BIGINT,
-           fullname VARCHAR(255),
-           language_code VARCHAR(15),
-           FOREIGN KEY (classroom_id) REFERENCES classrooms (id) ON DELETE CASCADE
-       )
-       """
+# DROP_PHOTOS_TABLE = """
+#        DROP TABLE photos;
+# """
 
 
-DROP_PHOTOS_TABLE = """
-       DROP TABLE photos;
-"""
-
-# id == telegram_id
-CREATE_PHOTOS_TABLE = """
-       CREATE TABLE photos (
-           id VARCHAR(255) PRIMARY KEY,
-           student_id BIGINT,
-           teacher_id BIGINT,
-           FOREIGN KEY (teacher_id) REFERENCES users (id) ON DELETE CASCADE,
-           FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
-       )
-       """
+# CREATE_PHOTOS_TABLE = """
+#        CREATE TABLE photos (
+#            id VARCHAR(255) PRIMARY KEY,
+#            student_id BIGINT,
+#            teacher_id BIGINT,
+#            FOREIGN KEY (teacher_id) REFERENCES teachers (id) ON DELETE CASCADE,
+#            FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+#        )
+#        """
 
 
 # DROP_TASKS_TABLE = """
@@ -72,21 +72,22 @@ CREATE_PHOTOS_TABLE = """
 #        """
 #
 #
-# DROP_CLASSROOM_STUDENTS_TABLE = """
-#        DROP TABLE classroom_students;
-# """
-#
-# CREATE_CLASSROOM_STUDENTS_TABLE = """
-#        CREATE TABLE classroom_students (
-#            id BIGSERIAL PRIMARY KEY,
-#            classroom_id BIGINT,
-#            student_id BIGINT,
-#            FOREIGN KEY (classroom_id) REFERENCES classrooms (id) ON DELETE CASCADE,
-#            FOREIGN KEY (student_id) REFERENCES users (id) ON DELETE CASCADE
-#        )
-#        """
-#
-#
+
+CREATE_CLASSROOM_STUDENTS_TABLE = """
+       CREATE TABLE classroom_students (
+           id BIGSERIAL PRIMARY KEY,
+           classroom_id BIGINT,
+           student_id BIGINT,
+           joined_utc TIMESTAMP,
+           FOREIGN KEY (classroom_id) REFERENCES classrooms (id) ON DELETE CASCADE,
+           FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+       )
+       """
+
+DROP_CLASSROOM_STUDENTS_TABLE = """
+       DROP TABLE classroom_students;
+"""
+
 # DROP_SUBMISSIONS_TABLE = """
 #        DROP TABLE submissions;
 # """
