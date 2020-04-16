@@ -1,7 +1,8 @@
 import abc
-from database.db_scripts import execute_database_command
 import string
 import random
+from database.db_scripts import execute_database_command
+from tasks.models import Task
 
 
 class Classroom:
@@ -48,6 +49,16 @@ class Classroom:
             )[0][0][0]
             return Classroom(self.teacher_id, self.name, generated_slug, self.created_utc, classroom_id)
 
+    def get_tasks(self):
+        try:
+            tasks = execute_database_command('''SELECT t.classroom_id, t.name, cl.created_utc, t.id FROM
+            classrooms cl JOIN tasks t ON cl.id = t.classroom_id WHERE cl.id=%s''', (self.id, ))[0]
+            return [Task(t[0], t[1], t[2], t[3]) for t in tasks]
+        except IndexError:
+            return None
+
+    tasks = property(get_tasks)
+
     def __str__(self):
         return f'{self.name} (id: {self.id})'
 
@@ -87,34 +98,3 @@ class ClassroomStudent:
 
     def __str__(self):
         return f'Classroom: {self.classroom_id} (Student: {self.student_id})'
-
-
-# class Photo:
-#     def __init__(self, telegram_id, student_id, teacher_id):
-#         self.id = telegram_id
-#         self.student_id = student_id
-#         self.teacher_id = teacher_id
-#
-#     @abc.abstractmethod
-#     def get(telegram_id):
-#         try:
-#             id, student_id, teacher_id = execute_database_command('SELECT * FROM photos WHERE id=%s', (telegram_id,))[0][0]
-#             return Photo(id, student_id, teacher_id)
-#         except IndexError:
-#             return None
-#
-#     def save(self):
-#         if Photo.get(self.id):
-#             execute_database_command(
-#                 'UPDATE photos SET student_id = %s, teacher_id = %s WHERE id = %s',
-#                 (self.student_id, self.teacher_id, self.id)
-#             )
-#         else:
-#             execute_database_command(
-#                 'INSERT INTO photos (id, student_id, teacher_id)  VALUES (%s, %s, %s)',
-#                 (self.id, self.student_id, self.teacher_id,)
-#             )
-#         return self
-#
-#     def __str__(self):
-#         return f'{self.id}'

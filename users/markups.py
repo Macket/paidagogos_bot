@@ -2,7 +2,7 @@ from telebot import types
 from users.models import Teacher
 
 
-def get_classrooms_inline_markup(user):
+def get_classroom_list_inline_markup(user):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     for classroom in user.get_classrooms():

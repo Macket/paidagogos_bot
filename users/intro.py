@@ -1,10 +1,10 @@
-# from telebot import types
 from bot import bot
 from users.models import Teacher, Student
 from users import markups as user_markups
 from classrooms.models import Classroom, ClassroomStudent
+from classrooms.views import classroom_list_view
+from classrooms.handlers import classroom_name_request
 from datetime import datetime, timezone
-import settings
 
 
 @bot.message_handler(commands=['start'])
@@ -19,11 +19,12 @@ def start(message):
 
             bot.send_message(message.chat.id, text)
             bot.send_message(message.chat.id, "Классные комнаты",
-                             reply_markup=user_markups.get_classrooms_inline_markup(teacher))
+                             reply_markup=user_markups.get_classroom_list_inline_markup(teacher))
         else:
             student = Student.get(message.chat.id) or \
                       Student(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
             classroom = Classroom.get_by_slug(classroom_slug)
+            print('STUDENT', student)
             teacher = Teacher.get(classroom.teacher_id)
             ClassroomStudent(classroom.id, student.id, joined_utc=datetime.now(timezone.utc)).save()  # TODO исключить дублирование
             if not student.fullname:
@@ -35,7 +36,7 @@ def start(message):
 
                 bot.send_message(message.chat.id, text, parse_mode='Markdown')
                 bot.send_message(message.chat.id, 'Классные комнаты',
-                                 reply_markup=user_markups.get_classrooms_inline_markup(student))
+                                 reply_markup=user_markups.get_classroom_list_inline_markup(student))
     else:
         student = Student.get(message.chat.id)
         if student:
@@ -45,7 +46,7 @@ def start(message):
 
             bot.send_message(message.chat.id, text)
             bot.send_message(message.chat.id, 'Классные комнаты',
-                             reply_markup=user_markups.get_classrooms_inline_markup(student))
+                             reply_markup=user_markups.get_classroom_list_inline_markup(student))
         else:
             # teacher = Teacher(message.chat.id, language_code=message.from_user.language_code)
             Teacher(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
@@ -69,39 +70,7 @@ def teacher_fullname_receive(message):
     teacher.fullname = message.text
     teacher.save()
 
-    classroom_request(message)
-
-
-def classroom_request(message):
-    teacher = Teacher.get(message.chat.id)
-
-    ru_text = f"Отправьте название класса. Например, «*7Б класс. Математика*».\n\n" \
-              f"Не беспокойтесь об офциальном названии, просто дайте такое имя, " \
-              f"которое будет понятно вашим ученикам."
-    en_text = None
-    text = ru_text if teacher.language_code == 'ru' else en_text
-
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
-    bot.register_next_step_handler(message, classroom_receive)
-
-
-def classroom_receive(message):
-    teacher = Teacher.get(message.chat.id)
-    classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
-
-    url = f'https://t.me/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
-        else f'https://t.me/remote_learning_bot?start=slug-{classroom.slug}'
-
-    ru_text = f"Вот ссылка на вашу классную комнату:\n\n" \
-              f"*{classroom.name}*. Учитель: _{teacher.fullname}_\n{url}\n\n" \
-              f"Отправьте её своим ученикам. Пройдя по ней и нажав команду *ЗАПУСТИТЬ*, " \
-              f"они сразу попадут в вашу классную комнату."
-    en_text = None
-    text = ru_text if teacher.language_code == 'ru' else en_text
-
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
-    bot.send_message(message.chat.id, "Классные комнаты",
-                     reply_markup=user_markups.get_classrooms_inline_markup(teacher))
+    classroom_name_request(message)
 
 
 def student_fullname_request(message):
@@ -129,5 +98,5 @@ def student_fullname_receive(message):
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
-    bot.send_message(message.chat.id, 'Классные комнаты',
-                     reply_markup=user_markups.get_classrooms_inline_markup(student))
+
+    classroom_list_view(message)

@@ -3,7 +3,7 @@ from users.models import Teacher
 from tasks.models import Task
 from tasks import markups
 from datetime import datetime, timezone
-from classrooms.handlers import show_classroom
+from classrooms.views import classroom_detail_view
 from utils.scripts import get_call_data
 
 
@@ -49,7 +49,7 @@ def task_name_receive(message, classroom_id):
 def compose_task(message, task):
     if message.text in ['Выдать задание', 'Assign task']:
         bot.send_message(message.chat.id, 'Всё', reply_markup=markups.remove_markup())
-        show_classroom(message, task.classroom_id)
+        classroom_detail_view(message, task.classroom_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
         bot.send_message(message.chat.id, 'Отмена')
     else:

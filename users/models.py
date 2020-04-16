@@ -32,7 +32,7 @@ class Teacher:
             execute_database_command(
                 'INSERT INTO teachers (id, fullname, language_code, registered_utc) '
                 f'''VALUES (%s, %s, %s, '{self.registered_utc}')''',
-                (self.id, self.fullname, self.language_code, self.registered_utc)
+                (self.id, self.fullname, self.language_code)
             )
         return self
 
@@ -43,6 +43,8 @@ class Teacher:
             return [Classroom(cl[0], cl[1], cl[2], cl[3], cl[4]) for cl in classrooms]
         except IndexError:
             return None
+
+    classrooms = property(get_classrooms)
 
     def __str__(self):
         return f'{self.fullname if self.fullname else "No name"} (id: {self.id})'
@@ -77,7 +79,7 @@ class Student:
             execute_database_command(
                 'INSERT INTO students (id, fullname, language_code, registered_utc) '
                 f'''VALUES (%s, %s, %s, '{self.registered_utc}')''',
-                (self.id, self.fullname, self.language_code, self.registered_utc)
+                (self.id, self.fullname, self.language_code)
             )
         return self
 
@@ -89,6 +91,8 @@ class Student:
             return [Classroom(cl[0], cl[1], cl[2], cl[3], cl[4]) for cl in classrooms]
         except IndexError:
             return None
+
+    classrooms = property(get_classrooms)
 
     def __str__(self):
         return f'{self.fullname if self.fullname else "No name"} (id: {self.id})'
