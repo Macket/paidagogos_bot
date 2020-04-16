@@ -58,21 +58,6 @@ DROP_CLASSROOMS_TABLE = """
 #        """
 
 
-# DROP_TASKS_TABLE = """
-#        DROP TABLE tasks;
-# """
-#
-# CREATE_TASKS_TABLE = """
-#        CREATE TABLE tasks (
-#            id BIGSERIAL PRIMARY KEY,
-#            classroom_id BIGINT,
-#            message_ids VARCHAR(1023),
-#            FOREIGN KEY (classroom_id) REFERENCES classrooms (id) ON DELETE CASCADE
-#        )
-#        """
-#
-#
-
 CREATE_CLASSROOM_STUDENTS_TABLE = """
        CREATE TABLE classroom_students (
            id BIGSERIAL PRIMARY KEY,
@@ -87,6 +72,38 @@ CREATE_CLASSROOM_STUDENTS_TABLE = """
 DROP_CLASSROOM_STUDENTS_TABLE = """
        DROP TABLE classroom_students;
 """
+
+CREATE_TASKS_TABLE = """
+       CREATE TABLE tasks (
+           id BIGSERIAL PRIMARY KEY,
+           classroom_id BIGINT,
+           name VARCHAR(255),
+           created_utc TIMESTAMP,
+           FOREIGN KEY (classroom_id) REFERENCES classrooms (id) ON DELETE CASCADE
+       )
+       """
+
+
+DROP_TASKS_TABLE = """
+       DROP TABLE tasks;
+"""
+
+CREATE_TASK_MESSAGES_TABLE = """
+       CREATE TABLE task_messages (
+           id BIGSERIAL PRIMARY KEY,
+           task_id BIGINT,
+           message_id BIGINT,
+           created_utc TIMESTAMP,
+           FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
+       )
+       """
+
+
+DROP_TASK_MESSAGES_TABLE = """
+       DROP TABLE task_messages;
+"""
+
+
 
 # DROP_SUBMISSIONS_TABLE = """
 #        DROP TABLE submissions;

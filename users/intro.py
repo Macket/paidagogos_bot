@@ -14,7 +14,7 @@ def start(message):
         teacher = Teacher.get(message.chat.id)
         if teacher:
             ru_text = "Вы уже зарегистрированы как учитель и не можете добавляться в классы"
-            en_text = ""
+            en_text = None
             text = ru_text if teacher.language_code == 'ru' else en_text
 
             bot.send_message(message.chat.id, text)
@@ -30,7 +30,7 @@ def start(message):
                 student_fullname_request(message)
             else:
                 ru_text = f"Вы добавлены в классную комнату: *{classroom.name}*. Учитель: _{teacher.fullname}_"
-                en_text = f""
+                en_text = None
                 text = ru_text if student.language_code == 'ru' else en_text
 
                 bot.send_message(message.chat.id, text, parse_mode='Markdown')
@@ -40,7 +40,7 @@ def start(message):
         student = Student.get(message.chat.id)
         if student:
             ru_text = "Вы уже зарегистрированы как ученик"
-            en_text = ""
+            en_text = None
             text = ru_text if student.language_code == 'ru' else en_text
 
             bot.send_message(message.chat.id, text)
@@ -56,7 +56,7 @@ def teacher_fullname_request(message):
     teacher = Teacher.get(message.chat.id)
 
     ru_text = f"Введите своё полное имя. Его будут видеть ваши ученики."
-    en_text = f"What is your full name?"
+    en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text)
@@ -67,7 +67,6 @@ def teacher_fullname_receive(message):
     teacher = Teacher.get(message.chat.id)
 
     teacher.fullname = message.text
-    print(teacher.fullname)
     teacher.save()
 
     classroom_request(message)
@@ -76,11 +75,10 @@ def teacher_fullname_receive(message):
 def classroom_request(message):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = f"Напиши название класса. Например, «*7Б класс. Математика*». " \
+    ru_text = f"Отправьте название класса. Например, «*7Б класс. Математика*».\n\n" \
               f"Не беспокойтесь об офциальном названии, просто дайте такое имя, " \
               f"которое будет понятно вашим ученикам."
-    en_text = f"Write your classroom name. Don't worry about " \
-              f"its official name. Just enter a name that students will understand."
+    en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
@@ -98,7 +96,7 @@ def classroom_receive(message):
               f"*{classroom.name}*. Учитель: _{teacher.fullname}_\n{url}\n\n" \
               f"Отправьте её своим ученикам. Пройдя по ней и нажав команду *ЗАПУСТИТЬ*, " \
               f"они сразу попадут в вашу классную комнату."
-    en_text = f"Here is your classroom link: \n\n Share it with your students"
+    en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
@@ -107,14 +105,11 @@ def classroom_receive(message):
 
 
 def student_fullname_request(message):
-    print('REQUEST')
     student = Student.get(message.chat.id)
-    print('IDDD', student.id)
 
     ru_text = "Введите своё полное имя. Его будут видеть ваши учителя."
-    en_text = "What is your full name?"
+    en_text = None
     text = ru_text if student.language_code == 'ru' else en_text
-    print(text)
 
     bot.send_message(message.chat.id, text)
     bot.register_next_step_handler(message, student_fullname_receive)
@@ -130,7 +125,7 @@ def student_fullname_receive(message):
     teacher = Teacher.get(classroom.teacher_id)
 
     ru_text = f"Вы добавлены в классную комнату: *{classroom.name}*. Учитель: _{teacher.fullname}_"
-    en_text = ""
+    en_text = None
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text, parse_mode='Markdown')

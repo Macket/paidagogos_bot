@@ -10,7 +10,7 @@ def get_classrooms_inline_markup(user):
             types.InlineKeyboardButton(
                 text=classroom.name if type(user) is Teacher else
                 f"{classroom.name} ({Teacher.get(classroom.teacher_id).fullname})",
-                callback_data='@@CLASSROOMS/{"classroom_id": ' + str(classroom.id) + '"}'
+                callback_data='@@CLASSROOM/{"classroom_id": ' + str(classroom.id) + '}'
             )
         )
 
@@ -34,7 +34,7 @@ def get_classrooms_inline_markup(user):
 #     markup = ru_markup if user.language_code == 'ru' else en_markup
 #
 #     return markup
-#
+
 #
 # def get_habits_markup(user_id):
 #     user = Teacher.get(user_id)

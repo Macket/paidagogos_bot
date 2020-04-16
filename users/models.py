@@ -32,7 +32,7 @@ class Teacher:
             execute_database_command(
                 'INSERT INTO teachers (id, fullname, language_code, registered_utc) '
                 f'''VALUES (%s, %s, %s, '{self.registered_utc}')''',
-                (self.id, self.fullname, self.language_code)
+                (self.id, self.fullname, self.language_code, self.registered_utc)
             )
         return self
 
@@ -77,7 +77,7 @@ class Student:
             execute_database_command(
                 'INSERT INTO students (id, fullname, language_code, registered_utc) '
                 f'''VALUES (%s, %s, %s, '{self.registered_utc}')''',
-                (self.id, self.fullname, self.language_code)
+                (self.id, self.fullname, self.language_code, self.registered_utc)
             )
         return self
 
