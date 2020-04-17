@@ -4,7 +4,7 @@ from tasks.models import Task, Submission
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
-from tasks.views import task_detail_view, task_message_list_view
+from tasks.views import task_detail_view, task_message_list_view, submission_list_view
 from utils.scripts import get_call_data
 
 
@@ -17,7 +17,7 @@ def handle_task_query(call):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS/'))
 def handle_submissions_query(call):
     data = get_call_data(call)
-    task_detail_view(call.message, data['task_id'], edit=True)
+    submission_list_view(call.message, data['task_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK_MESSAGES/'))
@@ -68,13 +68,14 @@ def task_name_receive(message, classroom_id):
 
 def compose_task(message, task):
     if message.text in ['Выдать задание', 'Assign task']:
-        bot.send_message(message.chat.id, 'Всё', reply_markup=markups.remove_markup())
+        bot.send_message(message.chat.id, 'Задание выдано вашим ученикам', reply_markup=markups.remove_markup())  # TODO add English
         classroom_detail_view(message, task.classroom_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена')
+        bot.send_message(message.chat.id, 'Отмена')  # TODO add English
+        classroom_detail_view(message, task.classroom_id)
     else:
         task.add(message)
-        bot.send_message(message.chat.id, 'Принято')
+        bot.send_message(message.chat.id, 'Принято')  # TODO add English
         bot.register_next_step_handler(message, compose_task, task)
 
 
@@ -84,7 +85,7 @@ def handle_new_submission_query(call):
 
     student = Student.get(call.message.chat.id)
 
-    submission = Submission(data['task_id'], created_utc=datetime.now(timezone.utc)).save()
+    submission = Submission(data['task_id'], student.id, created_utc=datetime.now(timezone.utc)).save()
 
     ru_text = "Отправьте мне выполненное задание в любом формате: " \
               "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями.\n\n" \
@@ -101,12 +102,12 @@ def handle_new_submission_query(call):
 
 def compose_submission(message, submission):
     if message.text in ['Отправить на проверку', 'Submit for review']:
-        bot.send_message(message.chat.id, 'Всё', reply_markup=markups.remove_markup())
-        # classroom_detail_view(message, task.classroom_id)
+        bot.send_message(message.chat.id, 'Ваше задание отправлено, ждите результата', reply_markup=markups.remove_markup())  # TODO add English
+        task_detail_view(message, submission.task_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена')
+        bot.send_message(message.chat.id, 'Отмена')  # TODO add English
+        task_detail_view(message, submission.task_id)
     else:
-        print('SUB!!!', submission)
         submission.add(message)
-        bot.send_message(message.chat.id, 'Принято')
+        bot.send_message(message.chat.id, 'Принято')  # TODO add English
         bot.register_next_step_handler(message, compose_submission, submission)

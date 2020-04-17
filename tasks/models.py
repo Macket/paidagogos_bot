@@ -49,6 +49,16 @@ class Task:
 
     messages = property(get_messages)
 
+    def get_submissions(self):
+        try:
+            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.assessment, s.created_utc, s.id FROM
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s''', (self.id, ))[0]
+            return [Submission(s[0], s[1], s[2], s[3], s[4]) for s in submissions]
+        except IndexError:
+            return None
+
+    submissions = property(get_submissions)
+
     def __str__(self):
         return f'{self.name} (id: {self.id})'
 
@@ -93,8 +103,9 @@ class TaskMessage:
 
 
 class Submission:
-    def __init__(self, task_id, assessment=None, created_utc=None, id=None):
+    def __init__(self, task_id, student_id, assessment=None, created_utc=None, id=None):
         self.task_id = task_id
+        self.student_id = student_id
         self.assessment = assessment
         self.created_utc = created_utc
         self.id = id
@@ -102,8 +113,8 @@ class Submission:
     @abc.abstractmethod
     def get(submission_id):
         try:
-            id, task_id, assessment, created_utc = execute_database_command('SELECT * FROM submissions WHERE id=%s', (submission_id, ))[0][0]
-            return Submission(task_id, assessment, created_utc, id)
+            id, task_id, student_id, assessment, created_utc = execute_database_command('SELECT * FROM submissions WHERE id=%s', (submission_id, ))[0][0]
+            return Submission(task_id, student_id, assessment, created_utc, id)
         except IndexError:
             return None
 
@@ -112,18 +123,19 @@ class Submission:
             execute_database_command(
                 'UPDATE submissions SET '
                 'task_id = %s, '
+                'student_id = %s, '
                 'assessment = %s, '
                 f'''created_utc = '{self.created_utc}' '''
                 'WHERE id = %s',
-                (self.task_id, self.assessment, self.id)
+                (self.task_id, self.student_id, self.assessment, self.id)
             )
         else:
             submission_id = execute_database_command(
-                'INSERT INTO submissions (task_id, assessment, created_utc) '
-                f'''VALUES (%s, %s, '{self.created_utc}') RETURNING id''',
-                (self.task_id, self.assessment)
+                'INSERT INTO submissions (task_id, student_id, assessment, created_utc) '
+                f'''VALUES (%s, %s, %s, '{self.created_utc}') RETURNING id''',
+                (self.task_id, self.student_id, self.assessment)
             )[0][0][0]
-            return Submission(self.task_id, self.assessment, self.created_utc, submission_id)
+            return Submission(self.task_id, self.student_id, self.assessment, self.created_utc, submission_id)
 
     def add(self, message):
         SubmissionMessage(self.id, message.chat.id, message.message_id, datetime.now(timezone.utc)).save()

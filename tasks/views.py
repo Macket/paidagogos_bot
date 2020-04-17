@@ -32,3 +32,23 @@ def task_detail_view(message, task_id, edit=False):
             reply_markup=markups.get_task_detail_inline_markup(user, task),
             parse_mode='Markdown')
 
+
+def submission_list_view(message, task_id, edit):
+    teacher = Teacher.get(message.chat.id)
+    task = Task.get(task_id)
+
+    text = f"*{task.name}*. Выполненные задания на проверку" if \
+        teacher.language_code == 'ru' else f"*{task.name}*. Submissions for review"
+    if edit:
+        bot.edit_message_text(
+            text,
+            chat_id=message.chat.id,
+            message_id=message.message_id,
+            reply_markup=markups.get_submissions_inline_markup(teacher, task),
+            parse_mode='Markdown')
+    else:
+        bot.send_message(
+            message.chat.id,
+            text,
+            reply_markup=markups.get_submissions_inline_markup(teacher, task),
+            parse_mode='Markdown')
