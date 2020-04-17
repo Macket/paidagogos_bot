@@ -1,6 +1,6 @@
 from bot import bot
-from users.models import Teacher
-from tasks.models import Task
+from users.models import Teacher, Student
+from tasks.models import Task, Submission
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
@@ -10,6 +10,12 @@ from utils.scripts import get_call_data
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
 def handle_task_query(call):
+    data = get_call_data(call)
+    task_detail_view(call.message, data['task_id'], edit=True)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS/'))
+def handle_submissions_query(call):
     data = get_call_data(call)
     task_detail_view(call.message, data['task_id'], edit=True)
 
@@ -70,3 +76,37 @@ def compose_task(message, task):
         task.add(message)
         bot.send_message(message.chat.id, 'Принято')
         bot.register_next_step_handler(message, compose_task, task)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_SUBMISSION/'))
+def handle_new_submission_query(call):
+    data = get_call_data(call)
+
+    student = Student.get(call.message.chat.id)
+
+    submission = Submission(data['task_id'], created_utc=datetime.now(timezone.utc)).save()
+
+    ru_text = "Отправьте мне выполненное задание в любом формате: " \
+              "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями.\n\n" \
+              "Когда закончите, просто нажмите кнопку *Отправить на проверку* и я передам его учителю"
+    en_text = None
+    text = ru_text if student.language_code == 'ru' else en_text
+
+    bot.send_message(call.message.chat.id,
+                     text,
+                     reply_markup=markups.get_compose_submission_markup(student),
+                     parse_mode='Markdown')
+    bot.register_next_step_handler(call.message, compose_submission, submission)
+
+
+def compose_submission(message, submission):
+    if message.text in ['Отправить на проверку', 'Submit for review']:
+        bot.send_message(message.chat.id, 'Всё', reply_markup=markups.remove_markup())
+        # classroom_detail_view(message, task.classroom_id)
+    elif message.text in ['❌ Отмена', '❌ Cancel']:
+        bot.send_message(message.chat.id, 'Отмена')
+    else:
+        print('SUB!!!', submission)
+        submission.add(message)
+        bot.send_message(message.chat.id, 'Принято')
+        bot.register_next_step_handler(message, compose_submission, submission)

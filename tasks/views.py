@@ -4,6 +4,16 @@ from tasks.models import Task
 from tasks import markups
 
 
+def task_message_list_view(message, task_id):
+    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+    task = Task.get(task_id)
+
+    text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else 'Content of the task: *{task.name}*'
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    for task_message in task.messages:
+        bot.forward_message(message.chat.id, task_message.teacher_id, task_message.message_id)
+
+
 def task_detail_view(message, task_id, edit=False):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
     task = Task.get(task_id)
@@ -22,12 +32,3 @@ def task_detail_view(message, task_id, edit=False):
             reply_markup=markups.get_task_detail_inline_markup(user, task),
             parse_mode='Markdown')
 
-
-def task_message_list_view(message, task_id):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    task = Task.get(task_id)
-
-    text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else 'Content of the task: *{task.name}*'
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
-    for task_message in task.messages:
-        bot.forward_message(message.chat.id, task_message.teacher_id, task_message.message_id)
