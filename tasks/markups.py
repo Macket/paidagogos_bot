@@ -1,5 +1,6 @@
 from telebot import types
 from users.models import Teacher, Student
+from tasks.models import SubmissionStatus
 
 
 def get_compose_task_markup(teacher):
@@ -54,17 +55,47 @@ def get_task_detail_inline_markup(user, task):
             )
         )
     else:
-        inline_markup.add(
-            types.InlineKeyboardButton(
-                text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
-                # TODO Добавить индикаторы: выполнено/не выполнено
-                callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
-            ),
-            types.InlineKeyboardButton(
-                text="Сдать задание" if user.language_code == 'ru' else 'Submit task',
-                callback_data='@@NEW_SUBMISSION/{"task_id": ' + str(task.id) + '}'
+        student = user
+        submission = student.get_submission_for_task(task.id)
+        task_status = submission.status if submission else 'NONE'
+
+        if task_status in ['NONE', SubmissionStatus.DRAFT.value]:
+            inline_markup.add(
+                types.InlineKeyboardButton(
+                    text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
+                    callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
+                ),
+                types.InlineKeyboardButton(
+                    text="Сдать задание" if user.language_code == 'ru' else 'Submit task',
+                    callback_data='@@NEW_SUBMISSION/{"task_id": ' + str(task.id) + '}'
+                )
             )
-        )
+        elif task_status == SubmissionStatus.REVIEW.value:
+            inline_markup.add(
+                types.InlineKeyboardButton(
+                    text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
+                    callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
+                ),
+                types.InlineKeyboardButton(
+                    text="Посмотреть своё выполнение" if user.language_code == 'ru' else 'View my submission',
+                    callback_data='@@SUBMISSION_MESSAGES/{"submission_id": ' + str(submission.id) + '}'
+                )
+            )
+        else:
+            inline_markup.add(
+                types.InlineKeyboardButton(
+                    text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
+                    callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
+                ),
+                types.InlineKeyboardButton(
+                    text="Посмотреть своё выполнение" if user.language_code == 'ru' else 'View my submission',
+                    callback_data='@@SUBMISSION_MESSAGES/{"submission_id": ' + str(submission.id) + '}'
+                ),
+                types.InlineKeyboardButton(
+                    text="Посмотреть результат" if user.language_code == 'ru' else 'View result',
+                    callback_data='@@SUBMISSION_REVIEW_RESULT/{"submission_id": ' + str(submission.id) + '}'
+                )
+            )
 
     inline_markup.add(
         types.InlineKeyboardButton(

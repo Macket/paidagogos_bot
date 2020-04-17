@@ -235,7 +235,16 @@ class SubmissionStatus(Enum):
 
 
 # TODO add English
-status_badges = {
+STATUS_ICONS = {
+    'NONE': '🔔',
+    'DRAFT': '✍️',
+    'REVIEW': '⏳',
+    'REVIEWED': '✅',
+}
+
+# TODO add English
+STATUS_BADGES = {
+    'NONE': '🔔 Не сдано',
     'DRAFT': '✍️ Черновик',
     'REVIEW': '⏳ На проверке',
     'REVIEWED': '✅ Проверено',

@@ -1,5 +1,6 @@
 import abc
 from classrooms.models import Classroom
+from tasks.models import Submission
 from database.db_scripts import execute_database_command
 
 
@@ -93,6 +94,23 @@ class Student:
             return None
 
     classrooms = property(get_classrooms)
+
+    def get_submission_for_task(self, task_id):
+        try:
+            s = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
+                        tasks t JOIN submissions s ON t.id = s.task_id WHERE s.student_id=%s AND t.id=%s''',
+                                                   (self.id, task_id))[0][0]
+            return Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6])
+        except IndexError:
+            return None
+
+    def get_task_status(self, task_id):
+        try:
+            return execute_database_command('''SELECT s.status FROM
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE s.student_id=%s AND t.id=%s''',
+                                              (self.id, task_id))[0][0][0]
+        except IndexError:
+            return 'NONE'
 
     def __str__(self):
         return f'{self.fullname if self.fullname else "No name"} (id: {self.id})'

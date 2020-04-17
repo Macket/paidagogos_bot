@@ -4,7 +4,7 @@ from tasks.models import Task, Submission, SubmissionStatus
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
-from tasks.views import task_detail_view, task_message_list_view, submission_list_view, submission_message_list_view
+from tasks.views import task_detail_view, task_message_list_view, submission_list_view, submission_message_list_view, submission_review_result_view
 from utils.scripts import get_call_data
 
 
@@ -38,6 +38,23 @@ def handle_submission_review_query(call):
     data = get_call_data(call)
     submission_message_list_view(call.message, data['submission_id'])
     submission_comment_request(call.message, data['submission_id'])
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_MESSAGES/'))
+def handle_submission_message_list_query(call):
+    data = get_call_data(call)
+    submission_message_list_view(call.message, data['submission_id'])
+    submission = Submission.get(data['submission_id'])
+    task_detail_view(call.message, submission.task_id)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW_RESULT/'))
+def handle_submission_review_result_query(call):
+    data = get_call_data(call)
+    submission_review_result_view(call.message, data['submission_id'])
+    submission = Submission.get(data['submission_id'])
+    task = Task.get(submission.task_id)
+    classroom_detail_view(call.message, task.classroom_id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_SUBMISSION/'))

@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from tasks.models import Task, Submission
+from tasks.models import Task, Submission, STATUS_BADGES
 from tasks import markups
 
 
@@ -17,10 +17,12 @@ def task_message_list_view(message, task_id):
 def task_detail_view(message, task_id, edit=False):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
     task = Task.get(task_id)
+    text = f'*{task.name}*' if \
+        type(user) is Teacher else f'*{task.name}*. {STATUS_BADGES[user.get_task_status(task.id)]}'
 
     if edit:
         bot.edit_message_text(
-            f'*{task.name}*',
+            text,
             chat_id=message.chat.id,
             message_id=message.message_id,
             reply_markup=markups.get_task_detail_inline_markup(user, task),
@@ -28,7 +30,7 @@ def task_detail_view(message, task_id, edit=False):
     else:
         bot.send_message(
             message.chat.id,
-            f'*{task.name}*',
+            text,
             reply_markup=markups.get_task_detail_inline_markup(user, task),
             parse_mode='Markdown')
 
@@ -58,10 +60,21 @@ def submission_message_list_view(message, submission_id):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
     submission = Submission.get(submission_id)
     task = Task.get(submission.task_id)
-    student = Student.get(submission.student_id)
 
-    text = f"Выполненное задание: *{task.name}*. Ученик: _{student.fullname}_" if \
+    text = f"Выполненное задание: *{task.name}*. Ученик: _{user.fullname}_" if \
         user.language_code == 'ru' else 'Submission: *{task.name}*. Student: _{student.fullname}_'
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
     for submission_message in submission.messages:
         bot.forward_message(message.chat.id, submission_message.student_id, submission_message.message_id)
+
+
+def submission_review_result_view(message, submission_id):
+    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+    submission = Submission.get(submission_id)
+    task = Task.get(submission.task_id)
+
+    ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
+              f"Комментарий: _{submission.comment}_"
+    en_text = None
+    text = ru_text if user.language_code == 'ru' else en_text
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
