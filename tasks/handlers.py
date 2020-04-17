@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from tasks.models import Task, Submission
+from tasks.models import Task, Submission, SubmissionStatus
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
@@ -85,7 +85,7 @@ def handle_new_submission_query(call):
 
     student = Student.get(call.message.chat.id)
 
-    submission = Submission(data['task_id'], student.id, created_utc=datetime.now(timezone.utc)).save()
+    submission = Submission(data['task_id'], student.id, status=SubmissionStatus.DRAFT.value, created_utc=datetime.now(timezone.utc)).save()
 
     ru_text = "Отправьте мне выполненное задание в любом формате: " \
               "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями.\n\n" \
@@ -102,6 +102,8 @@ def handle_new_submission_query(call):
 
 def compose_submission(message, submission):
     if message.text in ['Отправить на проверку', 'Submit for review']:
+        submission.status = SubmissionStatus.REVIEW.value
+        submission.save()
         bot.send_message(message.chat.id, 'Ваше задание отправлено, ждите результата', reply_markup=markups.remove_markup())  # TODO add English
         task_detail_view(message, submission.task_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
