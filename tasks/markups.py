@@ -33,26 +33,33 @@ def remove_markup():
 def get_task_detail_inline_markup(user, task):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
-    inline_markup.add(
-        types.InlineKeyboardButton(
-            text='Посмотреть задание' if user.language_code == 'ru' else 'View task',  # TODO Добавить индикаторы: выполнено/не выполнено
-            callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
-        )
-    )
-
     if type(user) is Teacher:
         inline_markup.add(
             types.InlineKeyboardButton(
-                text="Проверить выполнение" if user.language_code == 'ru' else 'Review submissions',
-                callback_data='@@SUBMISSIONS/{"task_id": ' + str(task.id) + '}'
+                text="На проверку" if user.language_code == 'ru' else 'Submissions for review',
+                callback_data='@@SUBMISSIONS_FOR_REVIEW/{"task_id": ' + str(task.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text="Проверено" if user.language_code == 'ru' else 'Reviewed submissions',
+                callback_data='@@SUBMISSIONS_REVIEWED/{"task_id": ' + str(task.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
+                # TODO Добавить индикаторы: выполнено/не выполнено
+                callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
             )
         )
     else:
         inline_markup.add(
             types.InlineKeyboardButton(
+                text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
+                # TODO Добавить индикаторы: выполнено/не выполнено
+                callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
+            ),
+            types.InlineKeyboardButton(
                 text="Сдать задание" if user.language_code == 'ru' else 'Submit task',
                 callback_data='@@NEW_SUBMISSION/{"task_id": ' + str(task.id) + '}'
-            ),
+            )
         )
 
     inline_markup.add(
@@ -65,10 +72,10 @@ def get_task_detail_inline_markup(user, task):
     return inline_markup
 
 
-def get_submissions_inline_markup(teacher, task):
+def get_submissions_for_review_inline_markup(teacher, task):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
-    for submission in task.submissions:
+    for submission in task.submissions_for_review:
         student = Student.get(submission.student_id)
         inline_markup.add(
             types.InlineKeyboardButton(

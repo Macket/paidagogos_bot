@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from tasks.models import Task
+from tasks.models import Task, Submission
 from tasks import markups
 
 
@@ -37,18 +37,31 @@ def submission_list_view(message, task_id, edit):
     teacher = Teacher.get(message.chat.id)
     task = Task.get(task_id)
 
-    text = f"*{task.name}*. Выполненные задания на проверку" if \
+    text = f"*{task.name}*. Задания на проверку" if \
         teacher.language_code == 'ru' else f"*{task.name}*. Submissions for review"
     if edit:
         bot.edit_message_text(
             text,
             chat_id=message.chat.id,
             message_id=message.message_id,
-            reply_markup=markups.get_submissions_inline_markup(teacher, task),
+            reply_markup=markups.get_submissions_for_review_inline_markup(teacher, task),
             parse_mode='Markdown')
     else:
         bot.send_message(
             message.chat.id,
             text,
-            reply_markup=markups.get_submissions_inline_markup(teacher, task),
+            reply_markup=markups.get_submissions_for_review_inline_markup(teacher, task),
             parse_mode='Markdown')
+
+
+def submission_message_list_view(message, submission_id):
+    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+    submission = Submission.get(submission_id)
+    task = Task.get(submission.task_id)
+    student = Student.get(submission.student_id)
+
+    text = f"Выполненное задание: *{task.name}*. Ученик: _{student.fullname}_" if \
+        user.language_code == 'ru' else 'Submission: *{task.name}*. Student: _{student.fullname}_'
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    for submission_message in submission.messages:
+        bot.forward_message(message.chat.id, submission_message.student_id, submission_message.message_id)

@@ -99,7 +99,7 @@ CREATE_SUBMISSIONS_TABLE = """
            student_id BIGINT,
            status VARCHAR(15),
            comment VARCHAR(1023),
-           assessment VARCHAR(63) DEFAULT NULL,
+           assessment VARCHAR(15) DEFAULT NULL,
            created_utc TIMESTAMP,
            FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
        )

@@ -50,15 +50,25 @@ class Task:
 
     messages = property(get_messages)
 
-    def get_submissions(self):
+    def get_submissions_for_review(self):
         try:
             submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
-            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s''', (self.id, ))[0]
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''', (self.id, SubmissionStatus.REVIEW.value))[0]
             return [Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) for s in submissions]
         except IndexError:
             return None
 
-    submissions = property(get_submissions)
+    submissions_for_review = property(get_submissions_for_review)
+
+    def get_submissions_reviewed(self):
+        try:
+            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''', (self.id, SubmissionStatus.REVIEWED.value))[0]
+            return [Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) for s in submissions]
+        except IndexError:
+            return None
+
+    submissions_reviewed = property(get_submissions_reviewed)
 
     def __str__(self):
         return f'{self.name} (id: {self.id})'
@@ -148,7 +158,7 @@ class Submission:
     def get_messages(self):
         try:
             submission_messages = execute_database_command('''SELECT sm.submission_id, sm.student_id, sm.message_id, sm.created_utc, sm.id FROM
-            submissions s JOIN submission_messages sm ON s.id = sm.task_id WHERE s.id=%s''', (self.id, ))[0]
+            submissions s JOIN submission_messages sm ON s.id = sm.submission_id WHERE s.id=%s''', (self.id, ))[0]
             return [SubmissionMessage(sm[0], sm[1], sm[2], sm[3], sm[4]) for sm in submission_messages]
         except IndexError:
             return None
@@ -210,3 +220,6 @@ status_badges = {
     'REVIEW': '⏳ На проверке',
     'REVIEWED': '✅ Проверено',
 }
+
+
+# 🔔
