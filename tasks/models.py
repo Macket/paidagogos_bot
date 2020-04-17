@@ -70,6 +70,26 @@ class Task:
 
     submissions_reviewed = property(get_submissions_reviewed)
 
+    def get_submissions_for_review_count(self):
+        try:
+            return execute_database_command('''SELECT COUNT(s.id) FROM
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''',
+                                            (self.id, SubmissionStatus.REVIEW.value))[0][0][0]
+        except IndexError:
+            return None
+
+    submissions_for_review_count = property(get_submissions_for_review_count)
+
+    def get_submissions_reviewed_count(self):
+        try:
+            return execute_database_command('''SELECT COUNT(s.id) FROM
+            tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''',
+                                            (self.id, SubmissionStatus.REVIEWED.value))[0][0][0]
+        except IndexError:
+            return None
+
+    submissions_reviewed_count = property(get_submissions_reviewed_count)
+
     def __str__(self):
         return f'{self.name} (id: {self.id})'
 
@@ -220,6 +240,3 @@ status_badges = {
     'REVIEW': '⏳ На проверке',
     'REVIEWED': '✅ Проверено',
 }
-
-
-# 🔔

@@ -34,18 +34,22 @@ def get_task_detail_inline_markup(user, task):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     if type(user) is Teacher:
+        text_for_review = "На проверку  " if user.language_code == 'ru' else 'Submissions for review  '
+        text_for_review += str(task.submissions_for_review_count)
+        text_reviewed = "Проверено  " if user.language_code == 'ru' else 'Reviewed submissions  '
+        text_reviewed += str(task.submissions_reviewed_count)
+
         inline_markup.add(
             types.InlineKeyboardButton(
-                text="На проверку" if user.language_code == 'ru' else 'Submissions for review',
+                text=text_for_review,
                 callback_data='@@SUBMISSIONS_FOR_REVIEW/{"task_id": ' + str(task.id) + '}'
             ),
             types.InlineKeyboardButton(
-                text="Проверено" if user.language_code == 'ru' else 'Reviewed submissions',
+                text=text_reviewed,
                 callback_data='@@SUBMISSIONS_REVIEWED/{"task_id": ' + str(task.id) + '}'
             ),
             types.InlineKeyboardButton(
                 text='Посмотреть задание' if user.language_code == 'ru' else 'View task',
-                # TODO Добавить индикаторы: выполнено/не выполнено
                 callback_data='@@TASK_MESSAGES/{"task_id": ' + str(task.id) + '}'
             )
         )

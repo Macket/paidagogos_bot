@@ -29,9 +29,11 @@ def get_classroom_detail_inline_markup(user, classroom):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     for task in classroom.tasks:
+        count = f"🔔{task.submissions_for_review_count}" if task.submissions_for_review_count > 0 else ""
+
         inline_markup.add(
             types.InlineKeyboardButton(
-                text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})",  # TODO Добавить индикаторы: выполнено/не выполнено
+                text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})  {count}",
                 callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
             )
         )
