@@ -6,9 +6,10 @@ from classrooms import markups
 
 def classroom_list_view(message, edit=False):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+    text = '*Классные комнаты*' if user.language_code == 'ru' else '*Classrooms*'
     if edit:
         bot.edit_message_text(
-            '*Классные комнаты*',
+            text,
             chat_id=message.chat.id,
             message_id=message.message_id,
             reply_markup=markups.get_classroom_list_inline_markup(user),
@@ -16,7 +17,7 @@ def classroom_list_view(message, edit=False):
     else:
         bot.send_message(
             message.chat.id,
-            '*Классные комнаты*',
+            text,
             reply_markup=markups.get_classroom_list_inline_markup(user),
             parse_mode='Markdown')
 

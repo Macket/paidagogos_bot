@@ -92,9 +92,11 @@ CREATE_TASK_MESSAGES_TABLE = """
        CREATE TABLE task_messages (
            id BIGSERIAL PRIMARY KEY,
            task_id BIGINT,
+           teacher_id BIGINT,
            message_id BIGINT,
            created_utc TIMESTAMP,
-           FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
+           FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE,
+           FOREIGN KEY (teacher_id) REFERENCES teachers (id) ON DELETE CASCADE
        )
        """
 

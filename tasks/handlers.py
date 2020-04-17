@@ -4,7 +4,21 @@ from tasks.models import Task
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
+from tasks.views import task_detail_view, task_message_list_view
 from utils.scripts import get_call_data
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
+def handle_task_query(call):
+    data = get_call_data(call)
+    task_detail_view(call.message, data['task_id'], edit=True)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK_MESSAGES/'))
+def handle_task_messages_query(call):
+    data = get_call_data(call)
+    task_message_list_view(call.message, data['task_id'])
+    task_detail_view(call.message, data['task_id'])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_TASK/'))
