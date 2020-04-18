@@ -52,17 +52,17 @@ def classroom_link_view(message, classroom_id):
     en_text1 = None  # TODO add English
     text1 = ru_text1 if teacher.language_code == 'ru' else en_text1
 
-    ru_text2 = f"Учитель _{teacher.fullname}_ приглашает вас в классную комнату " \
-              f"*{classroom.name}*.\n{url}\n\n" \
-              f"Пройдите по ссылке 👆🏻 и нажмите на команду *СТАРТ* (*ЗАПУСТИТЬ*), " \
+    ru_text2 = f"Учитель <i>{teacher.fullname}</i> приглашает вас в классную комнату " \
+              f"<b>{classroom.name}</b>.\n{url}\n\n" \
+              f"Пройдите по ссылке 👆🏻 и нажмите на команду <b>СТАРТ</b> (<b>ЗАПУСТИТЬ</b>), " \
               f"чтобы в неё войти.\n\n\n" \
-              f"_Прежде, чем пройти по ссылке, необходимо установить Telegram_\n" \
-              f"*Установить Telegram на Android*: https://play.google.com/store/apps/details?id=org.telegram.messenger\n" \
-              f"*Установить Telegram на iOS*: https://apps.apple.com/app/telegram-messenger/id686449807\n" \
-              f"*Установить Telegram на Windows*: https://drive.google.com/file/d/1wIZTfi2nXUaPLQlhT-drWKqisiVakSJB/view"
+              f"<b>Прежде, чем пройти по ссылке, необходимо установить Telegram</b>\n\n" \
+              f"<i>Установить Telegram на Android</i>: https://play.google.com/store/apps/details?id=org.telegram.messenger\n" \
+              f"<i>Установить Telegram на iOS</i>: https://apps.apple.com/app/telegram-messenger/id686449807\n" \
+              f"<i>Установить Telegram на Windows</i>: https://drive.google.com/file/d/1wIZTfi2nXUaPLQlhT-drWKqisiVakSJB/view"
     en_text2 = None
     text2 = ru_text2 if teacher.language_code == 'ru' else en_text2
 
     bot.send_message(message.chat.id, text1, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text2, parse_mode='Markdown')
+    bot.send_message(message.chat.id, text2, parse_mode='HTML')
 
