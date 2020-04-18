@@ -46,7 +46,7 @@ def classroom_link_view(message, classroom_id):
     teacher = Teacher.get(message.chat.id)
     classroom = Classroom.get(classroom_id)
     url = f'https://t-do.ru/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
-        else f'https://t-do.ru/remote_learning_bot?start=slug-{classroom.slug}'
+        else f'https://t-do.ru/paidagogos_bot?start=slug-{classroom.slug}'
 
     ru_text1 = "Вот приглашение в вашу классную комнату. Отправьте его своим ученикам"
     en_text1 = None  # TODO add English
