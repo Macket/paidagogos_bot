@@ -37,6 +37,9 @@ class Task:
             )[0][0][0]
             return Task(self.classroom_id, self.name, self.created_utc, task_id)
 
+    def delete(self):
+        execute_database_command('DELETE from tasks WHERE id=%s', (self.id, ))
+
     def add(self, message):
         TaskMessage(self.id, message.chat.id, message.message_id, datetime.now(timezone.utc)).save()
 
@@ -171,6 +174,9 @@ class Submission:
                 (self.task_id, self.student_id, self.status, self.comment, self.assessment)
             )[0][0][0]
             return Submission(self.task_id, self.student_id, self.status, self.comment, self.assessment, self.created_utc, submission_id)
+
+    def delete(self):
+        execute_database_command('DELETE from submissions WHERE id=%s', (self.id, ))
 
     def add(self, message):
         SubmissionMessage(self.id, message.chat.id, message.message_id, datetime.now(timezone.utc)).save()

@@ -123,8 +123,9 @@ def compose_task(message, task):
         bot.send_message(message.chat.id, 'Задание выдано вашим ученикам', reply_markup=markups.remove_markup())  # TODO add English
         classroom_detail_view(message, task.classroom_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена')  # TODO add English
+        bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
         classroom_detail_view(message, task.classroom_id)
+        task.delete()
     else:
         task.add(message)
         bot.send_message(message.chat.id, 'Принято')  # TODO add English
@@ -138,8 +139,9 @@ def compose_submission(message, submission):
         bot.send_message(message.chat.id, 'Ваше задание отправлено, ждите результата', reply_markup=markups.remove_markup())  # TODO add English
         task_detail_view(message, submission.task_id)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена')  # TODO add English
+        bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
         task_detail_view(message, submission.task_id)
+        submission.delete()
     else:
         submission.add(message)
         bot.send_message(message.chat.id, 'Принято')  # TODO add English
