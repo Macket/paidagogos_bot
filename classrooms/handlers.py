@@ -52,4 +52,4 @@ def classroom_name_receive(message):
     classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
 
     classroom_link_view(message, classroom.id)
-    classroom_list_view(message, classroom)
+    classroom_list_view(message)
