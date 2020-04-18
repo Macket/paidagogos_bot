@@ -1,3 +1,4 @@
+import settings
 from bot import bot
 from users.models import Teacher, Student
 from classrooms.models import Classroom
@@ -39,3 +40,19 @@ def classroom_detail_view(message, classroom_id, edit=False):
             f'*{classroom.name}*',
             reply_markup=markups.get_classroom_detail_inline_markup(user, classroom),
             parse_mode='Markdown')
+
+
+def classroom_link_view(message, classroom_id):
+    teacher = Teacher.get(message.chat.id)
+    classroom = Classroom.get(classroom_id)
+    url = f'https://t.me/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
+        else f'https://t.me/remote_learning_bot?start=slug-{classroom.slug}'
+
+    ru_text = f"Вот ссылка на вашу классную комнату:\n\n" \
+              f"*{classroom.name}*. Учитель: _{teacher.fullname}_\n{url}\n\n" \
+              f"Отправьте её своим ученикам. Пройдя по ней и нажав команду *СТАРТ* (*ЗАПУСТИТЬ*), " \
+              f"они сразу попадут в вашу классную комнату."
+    en_text = None
+    text = ru_text if teacher.language_code == 'ru' else en_text
+
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')

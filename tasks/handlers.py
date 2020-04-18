@@ -4,8 +4,15 @@ from tasks.models import Task, Submission, SubmissionStatus
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
-from tasks.views import task_detail_view, task_message_list_view, submission_list_view, submission_message_list_view, submission_review_result_view
+from tasks.views import task_list_view, task_detail_view, task_message_list_view, \
+    submission_list_view, submission_message_list_view, submission_review_result_view
 from utils.scripts import get_call_data
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASKS/'))
+def handle_task_query(call):
+    data = get_call_data(call)
+    task_list_view(call.message, data['classroom_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
@@ -33,19 +40,19 @@ def handle_submissions_for_review_query(call):
     submission_list_view(call.message, data['task_id'], edit=True)
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW/'))
-def handle_submission_review_query(call):
-    data = get_call_data(call)
-    submission_message_list_view(call.message, data['submission_id'])
-    submission_comment_request(call.message, data['submission_id'])
-
-
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_MESSAGES/'))
 def handle_submission_message_list_query(call):
     data = get_call_data(call)
     submission_message_list_view(call.message, data['submission_id'])
     submission = Submission.get(data['submission_id'])
     task_detail_view(call.message, submission.task_id)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW/'))
+def handle_submission_review_query(call):
+    data = get_call_data(call)
+    submission_message_list_view(call.message, data['submission_id'])
+    submission_comment_request(call.message, data['submission_id'])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW_RESULT/'))

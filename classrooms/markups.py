@@ -30,20 +30,14 @@ def get_classroom_detail_inline_markup(user, classroom):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     if type(user) is Teacher:
-        for task in classroom.tasks:
-            count = task.submissions_for_review_count
-            count = f"🔔{count}" if count > 0 else ""
-            inline_markup.add(
-                types.InlineKeyboardButton(
-                    text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})  {count}",
-                    callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
-                )
-            )
-
         inline_markup.add(
             types.InlineKeyboardButton(
-                text="➕ Новое задание" if user.language_code == 'ru' else '➕ New task',
-                callback_data='@@NEW_TASK/{"classroom_id": ' + str(classroom.id) + '}'
+                text="Задания" if user.language_code == 'ru' else 'Tasks',
+                callback_data='@@TASKS/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text="Ссылка для учеников" if user.language_code == 'ru' else 'Link for students',
+                callback_data='@@CLASSROOM_LINK/{"classroom_id": ' + str(classroom.id) + '}'
             )
         )
     else:

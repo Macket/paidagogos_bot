@@ -1,6 +1,7 @@
 from telebot import types
 from users.models import Teacher, Student
 from tasks.models import SubmissionStatus
+from tasks.models import STATUS_ICONS
 
 
 def get_compose_task_markup(teacher):
@@ -29,6 +30,48 @@ def get_compose_submission_markup(teacher):
 
 def remove_markup():
     return types.ReplyKeyboardRemove()
+
+
+def get_task_list_inline_markup(user, classroom):
+    inline_markup = types.InlineKeyboardMarkup(row_width=1)
+
+    if type(user) is Teacher:
+        for task in classroom.tasks:
+            count = task.submissions_for_review_count
+            count = f"🔔{count}" if count > 0 else ""
+            inline_markup.add(
+                types.InlineKeyboardButton(
+                    text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})  {count}",
+                    callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
+                )
+            )
+
+        inline_markup.add(
+            types.InlineKeyboardButton(
+                text="➕ Новое задание" if user.language_code == 'ru' else '➕ New task',
+                callback_data='@@NEW_TASK/{"classroom_id": ' + str(classroom.id) + '}'
+            )
+        )
+    else:
+        for task in classroom.tasks:
+            student = user
+            status_icon = STATUS_ICONS[student.get_task_status(task.id)]
+
+            inline_markup.add(
+                types.InlineKeyboardButton(
+                    text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})  {status_icon}",
+                    callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
+                )
+            )
+
+    inline_markup.add(
+        types.InlineKeyboardButton(
+            text="🔙 Назад" if user.language_code == 'ru' else '🔙 Back',
+            callback_data='@@CLASSROOMS/{}'
+        )
+    )
+
+    return inline_markup
 
 
 def get_task_detail_inline_markup(user, task):
