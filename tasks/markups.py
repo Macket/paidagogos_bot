@@ -67,7 +67,7 @@ def get_task_list_inline_markup(user, classroom):
     inline_markup.add(
         types.InlineKeyboardButton(
             text="🔙 Назад" if user.language_code == 'ru' else '🔙 Back',
-            callback_data='@@CLASSROOMS/{}'
+            callback_data='@@CLASSROOM/{"classroom_id": ' + str(classroom.id) + '}'
         )
     )
 

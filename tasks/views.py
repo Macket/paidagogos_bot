@@ -11,7 +11,7 @@ def task_list_view(message, classroom_id, edit=False):
 
     if edit:
         bot.edit_message_text(
-            f'*{classroom.name}*',
+            f'*{classroom.name}*. {"Список заданий" if user.language_code =="ru" else "Task list"}',
             chat_id=message.chat.id,
             message_id=message.message_id,
             reply_markup=markups.get_task_list_inline_markup(user, classroom),

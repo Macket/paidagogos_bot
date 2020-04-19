@@ -36,6 +36,10 @@ def get_classroom_detail_inline_markup(user, classroom):
                 callback_data='@@TASKS/{"classroom_id": ' + str(classroom.id) + '}'
             ),
             types.InlineKeyboardButton(
+                text="Список учеников" if user.language_code == 'ru' else 'Classroom students',
+                callback_data='@@CLASSROOM_STUDENTS/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+            types.InlineKeyboardButton(
                 text="Ссылка для учеников" if user.language_code == 'ru' else 'Link for students',
                 callback_data='@@CLASSROOM_LINK/{"classroom_id": ' + str(classroom.id) + '}'
             )

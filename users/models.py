@@ -116,7 +116,8 @@ class Student:
     def get_classroom_students(classroom_id):
         try:
             students = execute_database_command('''SELECT s.id, s.fullname, s.language_code, s.registered_utc FROM
-                        students s JOIN classroom_students cl_s ON s.id = cl_s.student_id''')[0]
+                            students s JOIN classroom_students cl_s ON s.id = cl_s.student_id WHERE cl_s.classroom_id=%s''',
+                                                (classroom_id,))[0]
             return [Student(s[0], s[1], s[2], s[3]) for s in students]
         except IndexError:
             return None

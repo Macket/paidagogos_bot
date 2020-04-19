@@ -42,6 +42,22 @@ def classroom_detail_view(message, classroom_id, edit=False):
             parse_mode='Markdown')
 
 
+def classroom_student_list_view(message, classroom_id):
+    teacher = Teacher.get(message.chat.id)
+    students = Student.get_classroom_students(classroom_id)
+    if len(students) == 0:
+        ru_text = 'В этой классной комнате пока что нет ни одного ученика'
+        en_text = None
+        text = ru_text if teacher.language_code == 'ru' else en_text
+    else:
+        classroom = Classroom.get(classroom_id)
+        text = f"*{classroom.name}*\n\n"
+        for student in students:
+            text += f"{student.fullname}\n"
+
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+
+
 def classroom_link_view(message, classroom_id):
     teacher = Teacher.get(message.chat.id)
     classroom = Classroom.get(classroom_id)

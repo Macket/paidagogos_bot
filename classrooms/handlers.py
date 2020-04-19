@@ -2,7 +2,7 @@ from bot import bot
 from users.models import Teacher
 from classrooms.models import Classroom
 from datetime import datetime, timezone
-from classrooms.views import classroom_detail_view, classroom_list_view, classroom_link_view
+from classrooms.views import classroom_detail_view, classroom_list_view, classroom_link_view, classroom_student_list_view
 from utils.scripts import get_call_data
 
 
@@ -20,6 +20,13 @@ def handle_classrooms_query(call):
 def handle_classroom_query(call):
     data = get_call_data(call)
     classroom_detail_view(call.message, data['classroom_id'], edit=True)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_STUDENTS/'))
+def handle_classroom_query(call):
+    data = get_call_data(call)
+    classroom_student_list_view(call.message, data['classroom_id'])
+    classroom_detail_view(call.message, data['classroom_id'])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_LINK/'))

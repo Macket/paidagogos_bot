@@ -44,5 +44,5 @@ def new_submission_review_result_notification(submission):
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(student.id, text, parse_mode='MarkDown')
-    submission_review_result_view_(student.id, task.id)
+    submission_review_result_view_(student.id, submission.id)
     task_detail_view_(student.id, task.id)
