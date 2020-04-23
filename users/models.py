@@ -120,6 +120,15 @@ class Student:
         except IndexError:
             return 'NONE'
 
+    def check_classroom_student(self, classroom_id):
+        try:
+            student_id = execute_database_command('''SELECT s.id FROM
+                                students s JOIN classroom_students cl_s ON s.id = cl_s.student_id WHERE s.id=%s AND cl_s.classroom_id=%s''',
+                                                (self.id, classroom_id))[0][0]
+            return True if student_id else False
+        except IndexError:
+            return False
+
     @abc.abstractmethod
     def get_classroom_students(classroom_id):
         try:

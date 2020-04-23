@@ -77,7 +77,7 @@ class ClassroomStudent:
     def get(classroom_student_id):
         try:
             id, classroom_id, student_id, joined_utc = execute_database_command('SELECT * FROM classroom_students WHERE id=%s', (classroom_student_id, ))[0][0]
-            return Classroom(classroom_id, student_id, joined_utc, id)
+            return ClassroomStudent(classroom_id, student_id, joined_utc, id)
         except IndexError:
             return None
 
@@ -97,7 +97,7 @@ class ClassroomStudent:
                 f'''VALUES (%s, %s, '{self.joined_utc}') RETURNING id''',
                 (self.classroom_id, self.student_id)
             )[0][0][0]
-            return Classroom(self.classroom_id, self.student_id, self.joined_utc, classroom_student_id)
+            return ClassroomStudent(self.classroom_id, self.student_id, self.joined_utc, classroom_student_id)
 
     def __str__(self):
         return f'Classroom: {self.classroom_id} (Student: {self.student_id})'
