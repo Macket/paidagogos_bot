@@ -112,6 +112,14 @@ class Student:
         except IndexError:
             return 'NONE'
 
+    def get_classroom_assessments(self, classroom_id):
+        try:
+            return execute_database_command('''SELECT s.assessment FROM tasks t JOIN submissions s
+            ON t.id = s.task_id WHERE s.student_id=%s AND t.classroom_id=%s AND s.assessment IS NOT NULL''',
+                                              (self.id, classroom_id))[0][0]
+        except IndexError:
+            return 'NONE'
+
     @abc.abstractmethod
     def get_classroom_students(classroom_id):
         try:

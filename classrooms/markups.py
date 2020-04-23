@@ -1,6 +1,5 @@
 from telebot import types
 from users.models import Teacher
-from tasks.models import STATUS_ICONS
 
 
 def get_classroom_list_inline_markup(user):
@@ -53,17 +52,16 @@ def get_classroom_detail_inline_markup(user, classroom):
             )
         )
     else:
-        for task in classroom.tasks:
-            student = user
-            status_icon = STATUS_ICONS[student.get_task_status(task.id)]
-
-            inline_markup.add(
-                types.InlineKeyboardButton(
-                    text=f"{status_icon} {task.name} ({task.created_utc.strftime('%d.%m.%Y')})",
-                    callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
-                )
-            )
-
+        inline_markup.add(
+            types.InlineKeyboardButton(
+                text="Задания" if user.language_code == 'ru' else 'Tasks',
+                callback_data='@@TASKS/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text="Мои оценки" if user.language_code == 'ru' else 'My grades',
+                callback_data='@@CLASSROOM_ASSESSMENTS/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+        )
 
     inline_markup.add(
         types.InlineKeyboardButton(

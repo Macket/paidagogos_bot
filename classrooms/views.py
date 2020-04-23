@@ -79,3 +79,17 @@ def classroom_link_view(message, classroom_id):
 
     bot.send_message(message.chat.id, text1)
     bot.send_message(message.chat.id, text2, parse_mode='Markdown')
+
+
+def classroom_assessments_view(message, user, classroom):
+    if type(user) is Student:
+        student = user
+        assessments = student.get_classroom_assessments(classroom.id)
+
+        text = f"*{classroom.name}*\n\n"
+
+        for assessment in assessments[:-1]:
+            text += f"{assessment}, "
+        text += f"{assessments[-1]}"
+        bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    # TODO add for teachers

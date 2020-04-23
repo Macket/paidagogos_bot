@@ -1,8 +1,9 @@
 from bot import bot
-from users.models import Teacher
+from users.models import Teacher, Student
 from classrooms.models import Classroom
 from datetime import datetime, timezone
-from classrooms.views import classroom_detail_view, classroom_list_view, classroom_link_view, classroom_student_list_view
+from classrooms.views import classroom_detail_view, classroom_list_view, classroom_link_view, \
+    classroom_student_list_view, classroom_assessments_view
 from classrooms.scenarios import rename_classroom_scenario, delete_classroom_scenario
 from utils.scripts import get_call_data
 
@@ -57,6 +58,16 @@ def handle_classroom_query(call):
     classroom = Classroom.get(data['classroom_id'])
     teacher = Teacher.get(call.message.chat.id)
     delete_classroom_scenario.are_you_sure_request(call.message, teacher, classroom)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_ASSESSMENTS/'))
+def handle_classroom_assessments_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
+    data = get_call_data(call)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom = Classroom.get(data['classroom_id'])
+    classroom_assessments_view(call.message, user, classroom)
+    classroom_detail_view(call.message, classroom.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_CLASSROOM/'))
