@@ -12,18 +12,21 @@ from utils.scripts import get_call_data
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASKS/'))
 def handle_task_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_list_view(call.message, data['classroom_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
 def handle_task_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_detail_view(call.message, data['task_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK_MESSAGES/'))
 def handle_task_messages_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_message_list_view(call.message, data['task_id'])
     task_detail_view(call.message, data['task_id'])
@@ -31,18 +34,21 @@ def handle_task_messages_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_TASK/'))
 def handle_new_task_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_name_request(call.message, data['classroom_id'])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS_FOR_REVIEW/'))
 def handle_submissions_for_review_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_list_view(call.message, data['task_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_MESSAGES/'))
 def handle_submission_message_list_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_message_list_view(call.message, data['submission_id'])
     submission = Submission.get(data['submission_id'])
@@ -51,6 +57,7 @@ def handle_submission_message_list_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW/'))
 def handle_submission_review_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_message_list_view(call.message, data['submission_id'])
     submission_comment_request(call.message, data['submission_id'])
@@ -58,6 +65,7 @@ def handle_submission_review_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW_RESULT/'))
 def handle_submission_review_result_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_review_result_view(call.message, data['submission_id'])
     submission = Submission.get(data['submission_id'])
@@ -67,6 +75,7 @@ def handle_submission_review_result_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_SUBMISSION/'))
 def handle_new_submission_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
 
     student = Student.get(call.message.chat.id)

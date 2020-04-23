@@ -14,17 +14,20 @@ def handle_classrooms_command(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOMS/'))
 def handle_classrooms_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     classroom_list_view(call.message, edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM/'))
 def handle_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom_detail_view(call.message, data['classroom_id'], edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_STUDENTS/'))
 def handle_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom_student_list_view(call.message, data['classroom_id'])
     classroom_detail_view(call.message, data['classroom_id'])
@@ -32,6 +35,7 @@ def handle_classroom_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_LINK/'))
 def handle_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom_link_view(call.message, data['classroom_id'])
     classroom_detail_view(call.message, data['classroom_id'])
@@ -39,6 +43,7 @@ def handle_classroom_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_RENAME/'))
 def handle_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom = Classroom.get(data['classroom_id'])
     teacher = Teacher.get(call.message.chat.id)
@@ -47,6 +52,7 @@ def handle_classroom_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_DELETE/'))
 def handle_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom = Classroom.get(data['classroom_id'])
     teacher = Teacher.get(call.message.chat.id)
@@ -55,6 +61,7 @@ def handle_classroom_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_CLASSROOM/'))
 def handle_new_classroom_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     classroom_name_request(call.message)
 
 
