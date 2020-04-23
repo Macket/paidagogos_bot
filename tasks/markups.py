@@ -170,3 +170,25 @@ def get_submissions_for_review_inline_markup(teacher, task):
     )
 
     return inline_markup
+
+
+def get_assessment_markup(teacher):
+    ru_markup = types.ReplyKeyboardMarkup(row_width=5)
+    ru_markup.add(
+        types.KeyboardButton('5'),
+        types.KeyboardButton('4'),
+        types.KeyboardButton('3'),
+        types.KeyboardButton('2'),
+        types.KeyboardButton('1'),
+    )
+    en_markup = types.ReplyKeyboardMarkup(row_width=5)
+    en_markup.add(
+        types.KeyboardButton('A'),
+        types.KeyboardButton('B'),
+        types.KeyboardButton('C'),
+        types.KeyboardButton('D'),
+        types.KeyboardButton('F'),
+    )
+    markup = ru_markup if teacher.language_code == 'ru' else en_markup
+
+    return markup

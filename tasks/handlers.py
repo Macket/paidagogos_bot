@@ -74,14 +74,12 @@ def handle_new_submission_query(call):
     submission = Submission(data['task_id'], student.id, status=SubmissionStatus.DRAFT.value, created_utc=datetime.now(timezone.utc)).save()
 
     ru_text = "Отправьте мне выполненное задание в любом формате: " \
-              "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями.\n\n" \
-              "Когда закончите, просто нажмите кнопку *Отправить на проверку* и я передам его учителю"
+              "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями."
     en_text = None
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(call.message.chat.id,
                      text,
-                     reply_markup=markups.get_compose_submission_markup(student),
                      parse_mode='Markdown')
     bot.register_next_step_handler(call.message, compose_submission, submission)
 
@@ -107,14 +105,12 @@ def task_name_receive(message, classroom_id):
     task = Task(classroom_id, message.text, datetime.now(timezone.utc)).save()
 
     ru_text = "Отправьте мне задание в любом формате: " \
-              "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями.\n\n" \
-              "Когда закончите, просто нажмите кнопку *Выдать задание* и я отправлю его ученикам"
+              "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями."
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id,
                      text,
-                     reply_markup=markups.get_compose_task_markup(teacher),
                      parse_mode='Markdown')
     bot.register_next_step_handler(message, compose_task, task)
 
@@ -129,8 +125,14 @@ def compose_task(message, task):
         classroom_detail_view(message, task.classroom_id)
         task.delete()
     else:
+        teacher = Teacher.get(message.chat.id)
         task.add(message)
-        bot.send_message(message.chat.id, 'Принято')  # TODO add English
+        bot.send_message(
+            message.chat.id,
+            'Отправьте ещё что-то или нажмите *Выдать задание*',
+            reply_markup=markups.get_compose_task_markup(teacher),
+            parse_mode='Markdown',
+        )  # TODO add English
         bot.register_next_step_handler(message, compose_task, task)
 
 
@@ -146,8 +148,14 @@ def compose_submission(message, submission):
         task_detail_view(message, submission.task_id)
         submission.delete()
     else:
+        student = Student.get(message.chat.id)
         submission.add(message)
-        bot.send_message(message.chat.id, 'Принято')  # TODO add English
+        bot.send_message(
+            message.chat.id,
+            'Отправьте ещё что-то или нажмите *Отправить на проверку*',
+            reply_markup=markups.get_compose_submission_markup(student),
+            parse_mode='Markdown',
+        )  # TODO add English
         bot.register_next_step_handler(message, compose_submission, submission)
 
 
@@ -175,13 +183,13 @@ def submission_comment_receive(message, submission_id):
 def submission_assessment_request(message, submission_id):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = "Поставьте оценку удобном для вас формате (не более 15 символов). Например, _5_, _Отлично_, _4-ка_"
+    ru_text = "Поставьте оценку"
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id,
                      text,
-                     # reply_markup=markups.get_compose_task_markup(teacher),  TODO Добавить клавиатуру
+                     reply_markup=markups.get_assessment_markup(teacher),
                      parse_mode='Markdown')
     bot.register_next_step_handler(message, submission_assessment_receive, submission_id)
 
