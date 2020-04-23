@@ -70,7 +70,7 @@ def handle_submission_review_result_query(call):
     submission_review_result_view(call.message, data['submission_id'])
     submission = Submission.get(data['submission_id'])
     task = Task.get(submission.task_id)
-    classroom_detail_view(call.message, task.classroom_id)
+    task_detail_view(call.message, task.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_SUBMISSION/'))
@@ -169,7 +169,7 @@ def compose_submission(message, submission):
 def submission_comment_request(message, submission_id):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = "Прокомментируйте задание, отправив текстовое сообщение (не более 1000 символов)"
+    ru_text = "Прокомментируйте задание, отправив любое сообщение"
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
@@ -182,7 +182,7 @@ def submission_comment_request(message, submission_id):
 
 def submission_comment_receive(message, submission_id):
     submission = Submission.get(submission_id)
-    submission.comment = message.text
+    submission.comment_message_id = message.message_id
     submission.save()
     submission_assessment_request(message, submission_id)
 

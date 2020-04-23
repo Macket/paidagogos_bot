@@ -97,7 +97,7 @@ class Student:
 
     def get_submission_for_task(self, task_id):
         try:
-            s = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
+            s = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment_message_id, s.assessment, s.created_utc, s.id FROM
                         tasks t JOIN submissions s ON t.id = s.task_id WHERE s.student_id=%s AND t.id=%s''',
                                                    (self.id, task_id))[0][0]
             return Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6])

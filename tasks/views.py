@@ -123,21 +123,31 @@ def submission_review_result_view_(user_id, submission_id):
     user = Teacher.get(user_id) or Student.get(user_id)
     submission = Submission.get(submission_id)
     task = Task.get(submission.task_id)
+    classroom = Classroom.get(task.classroom_id)
 
     ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
-              f"Комментарий: _{submission.comment}_"
+              f"Комментарий учителя👇🏻"
     en_text = None
     text = ru_text if user.language_code == 'ru' else en_text
     bot.send_message(user_id, text, parse_mode='Markdown')
+    if submission.comment_message_id:
+        bot.forward_message(user_id, classroom.teacher_id, message_id=submission.comment_message_id)
+    else:
+        bot.send_message(user_id, 'Нет комментария')  # TODO add English
 
 
 def submission_review_result_view(message, submission_id):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
     submission = Submission.get(submission_id)
     task = Task.get(submission.task_id)
+    classroom = Classroom.get(task.classroom_id)
 
     ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
-              f"Комментарий: _{submission.comment}_"
+              f"Комментарий учителя👇🏻"
     en_text = None
     text = ru_text if user.language_code == 'ru' else en_text
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    if submission.comment_message_id:
+        bot.forward_message(message.chat.id, classroom.teacher_id, message_id=submission.comment_message_id)
+    else:
+        bot.send_message(message.chat.id, 'Нет комментария')  # TODO add English

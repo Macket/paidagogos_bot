@@ -55,7 +55,7 @@ class Task:
 
     def get_submissions_for_review(self):
         try:
-            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
+            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment_message_id, s.assessment, s.created_utc, s.id FROM
             tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''', (self.id, SubmissionStatus.REVIEW.value))[0]
             return [Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) for s in submissions]
         except IndexError:
@@ -65,7 +65,7 @@ class Task:
 
     def get_submissions_reviewed(self):
         try:
-            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment, s.assessment, s.created_utc, s.id FROM
+            submissions = execute_database_command('''SELECT s.task_id, s.student_id, s.status, s.comment_message_id, s.assessment, s.created_utc, s.id FROM
             tasks t JOIN submissions s ON t.id = s.task_id WHERE t.id=%s AND s.status=%s''', (self.id, SubmissionStatus.REVIEWED.value))[0]
             return [Submission(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) for s in submissions]
         except IndexError:
@@ -137,11 +137,11 @@ class TaskMessage:
 
 
 class Submission:
-    def __init__(self, task_id, student_id, status, comment=None, assessment=None, created_utc=None, id=None):
+    def __init__(self, task_id, student_id, status, comment_message_id=None, assessment=None, created_utc=None, id=None):
         self.task_id = task_id
         self.student_id = student_id
         self.status = status
-        self.comment = comment
+        self.comment_message_id = comment_message_id
         self.assessment = assessment
         self.created_utc = created_utc
         self.id = id
@@ -149,8 +149,8 @@ class Submission:
     @abc.abstractmethod
     def get(submission_id):
         try:
-            id, task_id, student_id, status, comment, assessment, created_utc = execute_database_command('SELECT * FROM submissions WHERE id=%s', (submission_id, ))[0][0]
-            return Submission(task_id, student_id, status, comment, assessment, created_utc, id)
+            id, task_id, student_id, status, comment_message_id, assessment, created_utc = execute_database_command('SELECT * FROM submissions WHERE id=%s', (submission_id, ))[0][0]
+            return Submission(task_id, student_id, status, comment_message_id, assessment, created_utc, id)
         except IndexError:
             return None
 
@@ -161,19 +161,19 @@ class Submission:
                 'task_id = %s, '
                 'student_id = %s, '
                 'status = %s, '
-                'comment = %s, '
+                'comment_message_id = %s, '
                 'assessment = %s, '
                 f'''created_utc = '{self.created_utc}' '''
                 'WHERE id = %s',
-                (self.task_id, self.student_id, self.status, self.comment, self.assessment, self.id)
+                (self.task_id, self.student_id, self.status, self.comment_message_id, self.assessment, self.id)
             )
         else:
             submission_id = execute_database_command(
-                'INSERT INTO submissions (task_id, student_id, status, comment, assessment, created_utc) '
+                'INSERT INTO submissions (task_id, student_id, status, comment_message_id, assessment, created_utc) '
                 f'''VALUES (%s, %s, %s, %s, %s, '{self.created_utc}') RETURNING id''',
-                (self.task_id, self.student_id, self.status, self.comment, self.assessment)
+                (self.task_id, self.student_id, self.status, self.comment_message_id, self.assessment)
             )[0][0][0]
-            return Submission(self.task_id, self.student_id, self.status, self.comment, self.assessment, self.created_utc, submission_id)
+            return Submission(self.task_id, self.student_id, self.status, self.comment_message_id, self.assessment, self.created_utc, submission_id)
 
     def delete(self):
         execute_database_command('DELETE from submissions WHERE id=%s', (self.id, ))

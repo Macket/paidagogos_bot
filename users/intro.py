@@ -26,7 +26,7 @@ def start(message):
             classroom = Classroom.get_by_slug(classroom_slug)
             teacher = Teacher.get(classroom.teacher_id)
             if not student.check_classroom_student(classroom.id):
-                ClassroomStudent(classroom.id, student.id, joined_utc=datetime.now(timezone.utc)).save()  # TODO сделать изящнее
+                ClassroomStudent(classroom.id, student.id, joined_utc=datetime.now(timezone.utc)).save()  # TODO сделать с нормальной обратной связью, а не всегда писать "Вы добавлены..."
             if not student.fullname:
                 student_fullname_request(message)
             else:
