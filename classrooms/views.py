@@ -61,24 +61,21 @@ def classroom_student_list_view(message, classroom_id):
 def classroom_link_view(message, classroom_id):
     teacher = Teacher.get(message.chat.id)
     classroom = Classroom.get(classroom_id)
-    url = f'https://t-do.ru/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
+    url_ru = f'https://t-do.ru/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
         else f'https://t-do.ru/paidagogos_bot?start=slug-{classroom.slug}'
+
+    url = f'https://t.me/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
+        else f'https://t.me/paidagogos_bot?start=slug-{classroom.slug}'
 
     ru_text1 = "Вот приглашение в вашу классную комнату. Отправьте его своим ученикам"
     en_text1 = None  # TODO add English
     text1 = ru_text1 if teacher.language_code == 'ru' else en_text1
 
-    ru_text2 = f"Учитель <i>{teacher.fullname}</i> приглашает вас в классную комнату " \
-              f"<b>{classroom.name}</b>.\n{url}\n\n" \
-              f"Пройдите по ссылке 👆🏻 и нажмите на команду <b>СТАРТ</b> (<b>ЗАПУСТИТЬ</b>), " \
-              f"чтобы в неё войти.\n\n\n" \
-              f"<b>Прежде, чем пройти по ссылке, необходимо установить Telegram</b>\n\n" \
-              f"<i>Установить Telegram на Android</i>: https://play.google.com/store/apps/details?id=org.telegram.messenger\n" \
-              f"<i>Установить Telegram на iOS</i>: https://apps.apple.com/app/telegram-messenger/id686449807\n" \
-              f"<i>Установить Telegram на Windows</i>: https://drive.google.com/file/d/1wIZTfi2nXUaPLQlhT-drWKqisiVakSJB/view"
+    ru_text2 = f"Учитель _{teacher.fullname}_ приглашает вас в классную комнату *{classroom.name}*.\n\n" \
+               f"*Ссылка для компьютера*: {url_ru}\n\n" \
+               f"*Ссылка для телефона*: {url}\n"
     en_text2 = None
     text2 = ru_text2 if teacher.language_code == 'ru' else en_text2
 
-    bot.send_message(message.chat.id, text1, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text2, parse_mode='HTML')
-
+    bot.send_message(message.chat.id, text1)
+    bot.send_message(message.chat.id, text2, parse_mode='Markdown')

@@ -44,13 +44,11 @@ def handle_new_classroom_query(call):
 def classroom_name_request(message):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = f"Отправьте название класса. Например, «*5А класс. Русский язык*».\n\n" \
-              f"Не беспокойтесь об офциальном названии, просто дайте такое имя, " \
-              f"которое будет понятно вашим ученикам."
+    ru_text = f"Отправьте название класса"
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(message.chat.id, text)
     bot.register_next_step_handler(message, classroom_name_receive)
 
 

@@ -207,6 +207,7 @@ def submission_assessment_receive(message, submission_id):
 
     bot.send_message(message.chat.id,
                      text,
+                     reply_markup=markups.remove_markup(),
                      parse_mode='Markdown')
     task_detail_view(message, submission.task_id)
     new_submission_review_result_notification(submission)
