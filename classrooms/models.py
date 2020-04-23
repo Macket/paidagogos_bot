@@ -54,7 +54,7 @@ class Classroom:
 
     def get_tasks(self):
         try:
-            tasks = execute_database_command('''SELECT t.classroom_id, t.name, cl.created_utc, t.id FROM
+            tasks = execute_database_command('''SELECT t.classroom_id, t.name, t.created_utc, t.id FROM
             classrooms cl JOIN tasks t ON cl.id = t.classroom_id WHERE cl.id=%s ORDER BY t.created_utc DESC''', (self.id, ))[0]
             return [Task(t[0], t[1], t[2], t[3]) for t in tasks]
         except IndexError:
