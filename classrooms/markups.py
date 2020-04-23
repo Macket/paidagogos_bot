@@ -42,6 +42,14 @@ def get_classroom_detail_inline_markup(user, classroom):
             types.InlineKeyboardButton(
                 text="Ссылка для учеников" if user.language_code == 'ru' else 'Link for students',
                 callback_data='@@CLASSROOM_LINK/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text="Переименовать классную комнату" if user.language_code == 'ru' else 'Rename classroom',
+                callback_data='@@CLASSROOM_RENAME/{"classroom_id": ' + str(classroom.id) + '}'
+            ),
+            types.InlineKeyboardButton(
+                text="🗑 Удалить классную комнату" if user.language_code == 'ru' else '🗑 Delete classroom',
+                callback_data='@@CLASSROOM_DELETE/{"classroom_id": ' + str(classroom.id) + '}'
             )
         )
     else:
@@ -66,3 +74,14 @@ def get_classroom_detail_inline_markup(user, classroom):
 
     return inline_markup
 
+
+def are_you_sure_markup(teacher):
+    ru_markup = types.ReplyKeyboardMarkup(row_width=2)
+    ru_markup.add(types.KeyboardButton('Да'))
+    ru_markup.add(types.KeyboardButton('Нет'))
+    en_markup = types.ReplyKeyboardMarkup(row_width=2)
+    en_markup.add(types.KeyboardButton('Yes'))
+    en_markup.add(types.KeyboardButton('No'))
+    markup = ru_markup if teacher.language_code == 'ru' else en_markup
+
+    return markup

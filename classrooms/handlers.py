@@ -3,6 +3,7 @@ from users.models import Teacher
 from classrooms.models import Classroom
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view, classroom_list_view, classroom_link_view, classroom_student_list_view
+from classrooms.scenarios import rename_classroom_scenario, delete_classroom_scenario
 from utils.scripts import get_call_data
 
 
@@ -34,6 +35,22 @@ def handle_classroom_query(call):
     data = get_call_data(call)
     classroom_link_view(call.message, data['classroom_id'])
     classroom_detail_view(call.message, data['classroom_id'])
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_RENAME/'))
+def handle_classroom_query(call):
+    data = get_call_data(call)
+    classroom = Classroom.get(data['classroom_id'])
+    teacher = Teacher.get(call.message.chat.id)
+    rename_classroom_scenario.classroom_name_request(call.message, teacher, classroom)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_DELETE/'))
+def handle_classroom_query(call):
+    data = get_call_data(call)
+    classroom = Classroom.get(data['classroom_id'])
+    teacher = Teacher.get(call.message.chat.id)
+    delete_classroom_scenario.are_you_sure_request(call.message, teacher, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_CLASSROOM/'))

@@ -49,6 +49,9 @@ class Classroom:
             )[0][0][0]
             return Classroom(self.teacher_id, self.name, generated_slug, self.created_utc, classroom_id)
 
+    def delete(self):
+        execute_database_command('DELETE from classrooms WHERE id=%s', (self.id, ))
+
     def get_tasks(self):
         try:
             tasks = execute_database_command('''SELECT t.classroom_id, t.name, cl.created_utc, t.id FROM
