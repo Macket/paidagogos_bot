@@ -56,7 +56,7 @@ def start(message):
 def teacher_fullname_request(message):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = f"Введите своё полное имя. Его будут видеть ваши ученики."
+    ru_text = f"Введите своё ФИО. Его будут видеть ваши ученики."
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 
@@ -76,7 +76,7 @@ def teacher_fullname_receive(message):
 def student_fullname_request(message):
     student = Student.get(message.chat.id)
 
-    ru_text = "Введите своё полное имя. Его будут видеть ваши учителя."
+    ru_text = "Введите свою фамилию и имя. Их будут видеть ваши учителя."
     en_text = None
     text = ru_text if student.language_code == 'ru' else en_text
 

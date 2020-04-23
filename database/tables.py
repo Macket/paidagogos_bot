@@ -90,8 +90,6 @@ DROP_TASK_MESSAGES_TABLE = """
        DROP TABLE task_messages;
 """
 
-
-
 CREATE_SUBMISSIONS_TABLE = """
        CREATE TABLE submissions (
            id BIGSERIAL PRIMARY KEY,
