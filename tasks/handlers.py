@@ -87,8 +87,7 @@ def handle_new_submission_query(call):
 def task_name_request(message, classroom_id):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = "Отправьте название задания, например, «*Десятичные дроби*».\n\n" \
-              "_Подсказка_: не включайте в название дату, это будет сделано автоматически."
+    ru_text = "Отправьте название задания"
     en_text = None
     text = ru_text if teacher.language_code == 'ru' else en_text
 

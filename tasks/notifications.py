@@ -25,7 +25,7 @@ def new_submission_review_result_notification(submission):
     student = Student.get(submission.student_id)
     teacher = Teacher.get(classroom.teacher_id)
 
-    ru_text = f"🔔 Ваше задание проверено: *{task.name}*\n\n*{classroom.name}*. Учитель: _{teacher.fullname}_"
+    ru_text = f"🔔 Ваше задание проверено\n\n*{classroom.name}*\n_{teacher.fullname}_"
     en_text = None
     text = ru_text if student.language_code == 'ru' else en_text
 

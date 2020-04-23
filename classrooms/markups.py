@@ -59,7 +59,7 @@ def get_classroom_detail_inline_markup(user, classroom):
 
             inline_markup.add(
                 types.InlineKeyboardButton(
-                    text=f"{task.name} ({task.created_utc.strftime('%d.%m.%Y')})  {status_icon}",
+                    text=f"{status_icon} {task.name} ({task.created_utc.strftime('%d.%m.%Y')})",
                     callback_data='@@TASK/{"task_id": ' + str(task.id) + '}'
                 )
             )
