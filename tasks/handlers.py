@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
 from tasks.views import task_list_view, task_detail_view, task_message_list_view, \
     submission_list_view, submission_message_list_view, submission_review_result_view
-from tasks.notifications import new_task_notification, new_submission_notification, new_submission_review_result_notification
+from tasks.notifications import new_task_notification, new_submission_review_result_notification
 from utils.scripts import get_call_data
 
 
@@ -142,7 +142,6 @@ def compose_submission(message, submission):
         submission.save()
         bot.send_message(message.chat.id, 'Ваше задание отправлено, ждите результата', reply_markup=markups.remove_markup())  # TODO add English
         task_detail_view(message, submission.task_id)
-        new_submission_notification(submission)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
         bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
         task_detail_view(message, submission.task_id)
