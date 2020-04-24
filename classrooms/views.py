@@ -71,14 +71,14 @@ def classroom_link_view(message, classroom_id):
     en_text1 = None  # TODO add English
     text1 = ru_text1 if teacher.language_code == 'ru' else en_text1
 
-    ru_text2 = f"Учитель _{teacher.fullname}_ приглашает вас в классную комнату *{classroom.name}*.\n\n" \
-               f"*Ссылка для компьютера*: {url_ru}\n\n" \
-               f"*Ссылка для телефона*: {url}\n"
+    ru_text2 = f"Учитель <i>{teacher.fullname}</i> приглашает вас в классную комнату <b>{classroom.name}</b>.\n\n" \
+               f"<b>Ссылка для компьютера</b>: {url_ru}\n\n" \
+               f"<b>Ссылка для телефона</b>: {url}\n"
     en_text2 = None
     text2 = ru_text2 if teacher.language_code == 'ru' else en_text2
 
     bot.send_message(message.chat.id, text1)
-    bot.send_message(message.chat.id, text2, parse_mode='Markdown')
+    bot.send_message(message.chat.id, text2, parse_mode='HTML')
 
 
 def classroom_assessments_view(message, user, classroom):
