@@ -107,7 +107,6 @@ DROP_SUBMISSIONS_TABLE = """
        DROP TABLE submissions;
 """
 
-
 CREATE_SUBMISSION_MESSAGES_TABLE = """
        CREATE TABLE submission_messages (
            id BIGSERIAL PRIMARY KEY,
@@ -123,4 +122,21 @@ CREATE_SUBMISSION_MESSAGES_TABLE = """
 
 DROP_SUBMISSION_MESSAGES_TABLE = """
        DROP TABLE submission_messages;
+"""
+
+CREATE_SUBMISSION_REVIEW_MESSAGES_TABLE = """
+       CREATE TABLE submission_review_messages (
+           id BIGSERIAL PRIMARY KEY,
+           submission_id BIGINT,
+           teacher_id BIGINT,
+           message_id BIGINT,
+           created_utc TIMESTAMP,
+           FOREIGN KEY (submission_id) REFERENCES submissions (id) ON DELETE CASCADE,
+           FOREIGN KEY (teacher_id) REFERENCES teachers (id) ON DELETE CASCADE
+       )
+       """
+
+
+DROP_SUBMISSION_REVIEW_MESSAGES_TABLE = """
+       DROP TABLE submission_review_messages;
 """

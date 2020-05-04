@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from tasks.models import Task, Submission, SubmissionStatus
+from tasks.models import Task, Submission, SubmissionStatus, SubmissionReviewMessage
 from tasks import markups
 from datetime import datetime, timezone
 from classrooms.views import classroom_detail_view
@@ -181,9 +181,8 @@ def submission_comment_request(message, submission_id):
 
 
 def submission_comment_receive(message, submission_id):
-    submission = Submission.get(submission_id)
-    submission.comment_message_id = message.message_id
-    submission.save()
+    SubmissionReviewMessage(submission_id, message.chat.id, message.message_id,
+                            created_utc=datetime.now(timezone.utc)).save()
     submission_assessment_request(message, submission_id)
 
 

@@ -1,6 +1,7 @@
 import time
 from bot import bot
 from users import intro
+from users import photos
 from classrooms import handlers
 from tasks import handlers
 from database.db_scripts import init_database

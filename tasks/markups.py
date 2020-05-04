@@ -1,3 +1,4 @@
+import settings
 from telebot import types
 from users.models import Teacher, Student
 from tasks.models import SubmissionStatus
@@ -192,3 +193,20 @@ def get_assessment_markup(teacher):
     markup = ru_markup if teacher.language_code == 'ru' else en_markup
 
     return markup
+
+
+def get_drawer_markup(file_id, chat_id, message_id=None, submission_id=None):
+    inline_markup = types.InlineKeyboardMarkup(row_width=1)
+
+    url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&chat_id={chat_id}' if settings.DEBUG \
+        else f'https://remote-homework.herokuapp.com//drawer/?file_id={file_id}&chat_id={chat_id}'
+    if message_id:
+        url += f'&message_id={message_id}'
+    if submission_id:
+        url += f'&submission_id={submission_id}'
+
+    inline_markup.add(
+        types.InlineKeyboardButton(text='Make notes', url=url),
+    )
+
+    return inline_markup

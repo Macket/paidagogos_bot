@@ -1,30 +1,16 @@
-from telebot import types
 from bot import bot
-from users.models import Student, Teacher
-from classrooms.models import Classroom, Photo
-import settings
-
-
-def get_drawer_markup(file_id, file_path):
-
-    inline_markup = types.InlineKeyboardMarkup(row_width=1)
-
-    url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&file_path={file_path}' if settings.DEBUG \
-        else f'https://remote-homework.herokuapp.com//drawer/?file_id={file_id}&file_path={file_path}'
-    inline_markup.add(
-        types.InlineKeyboardButton(text='Make notes', url=url),
-    )
-
-    return inline_markup
+from users.models import Teacher
+from tasks.markups import get_drawer_markup
 
 
 @bot.message_handler(content_types=['photo'])
 def new_photo(message):
-    student = Student.get(message.chat.id)
-    if student:
-        file_info = bot.get_file(message.photo[2].file_id)
-        teacher = Teacher.get(Classroom.get(student.classroom_id).teacher_id)
-        Photo(file_info.file_id, student.id, teacher.id).save()
-
-        bot.send_photo(teacher.id, file_info.file_id)
-        # bot.send_message(teacher.id, f'Homework from Nastya. Click this button to make some notes', reply_markup=get_drawer_markup(file_info.file_id, file_info.file_path))
+    teacher = Teacher.get(message.chat.id)
+    if teacher:
+        bot.delete_message(message.chat.id, message.message_id)
+        bot.send_photo(
+            teacher.id,
+            message.photo[-1].file_id,
+            caption='Нажми, чтобы исправить ошибки👇🏻',  # TODO add English
+            reply_markup=get_drawer_markup(message.photo[-1].file_id, message.chat.id)
+        )
