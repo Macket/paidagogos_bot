@@ -126,7 +126,7 @@ def submission_message_list_view(message, submission_id):
             )
             bot.send_message(
                 user.id,
-                'Нажми, чтобы исправить ошибки👇🏻',  # TODO add English
+                'Нажмите, чтобы исправить ошибки👇🏻',  # TODO add English
                 reply_markup=get_drawer_markup(message.photo[-1].file_id, message.chat.id,
                                                             message_with_button.message_id, submission_id)
             )

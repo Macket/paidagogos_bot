@@ -199,14 +199,15 @@ def get_drawer_markup(file_id, chat_id, message_id=None, submission_id=None):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 
     url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&chat_id={chat_id}' if settings.DEBUG \
-        else f'https://remote-homework.herokuapp.com//drawer/?file_id={file_id}&chat_id={chat_id}'
+        else f'https://paidagogos_drawer.herokuapp.com//drawer/?file_id={file_id}&chat_id={chat_id}'
     if message_id:
         url += f'&message_id={message_id}'
     if submission_id:
         url += f'&submission_id={submission_id}'
 
     inline_markup.add(
-        types.InlineKeyboardButton(text='Make notes', url=url),
+        #  TODO add English
+        types.InlineKeyboardButton(text='Исправить ошибки', url=url),
     )
 
     return inline_markup
