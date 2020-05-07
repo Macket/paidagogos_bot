@@ -64,9 +64,9 @@ def handle_classroom_query(call):
 def handle_classroom_assessments_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    student = Student.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
-    classroom_assessments_view(call.message, user, classroom)
+    classroom_assessments_view(call.message, student, classroom)
     classroom_detail_view(call.message, classroom.id)
 
 

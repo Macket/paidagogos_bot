@@ -3,7 +3,7 @@ from users.models import Teacher, Student
 from tasks.models import Task, Submission, SubmissionStatus, SubmissionReviewMessage
 from tasks import markups
 from datetime import datetime, timezone
-from classrooms.views import classroom_detail_view
+from classrooms.views import classroom_detail_view, task_assessments_view
 from tasks.views import task_list_view, task_detail_view, task_message_list_view, \
     submission_list_view, submission_message_list_view, submission_review_result_view
 from tasks.notifications import new_task_notification, new_submission_review_result_notification
@@ -44,6 +44,16 @@ def handle_submissions_for_review_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_list_view(call.message, data['task_id'], edit=True)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS_REVIEWED/'))
+def handle_submissions_for_review_query(call):
+    bot.clear_step_handler_by_chat_id(call.message.chat.id)
+    data = get_call_data(call)
+    teacher = Teacher.get(call.message.chat.id)
+    task = Task.get(data['task_id'])
+    task_assessments_view(call.message, teacher, task)
+    task_detail_view(call.message, task.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_MESSAGES/'))

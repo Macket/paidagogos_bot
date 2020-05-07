@@ -47,6 +47,15 @@ class Teacher:
 
     classrooms = property(get_classrooms)
 
+    def get_task_assessments(self, task_id):
+        try:
+            return execute_database_command('''SELECT st.fullname, s.assessment FROM tasks t JOIN submissions s
+            ON t.id = s.task_id JOIN students st ON s.student_id=st.id JOIN classrooms cl ON t.classroom_id=cl.id
+            WHERE cl.teacher_id=%s AND t.id=%s AND s.assessment IS NOT NULL''',
+                                              (self.id, task_id))[0]
+        except IndexError:
+            return None
+
     def __str__(self):
         return f'{self.fullname if self.fullname else "No name"} (id: {self.id})'
 
@@ -114,11 +123,11 @@ class Student:
 
     def get_classroom_assessments(self, classroom_id):
         try:
-            return execute_database_command('''SELECT s.assessment FROM tasks t JOIN submissions s
+            return execute_database_command('''SELECT t.name, t.created_utc, s.assessment FROM tasks t JOIN submissions s
             ON t.id = s.task_id WHERE s.student_id=%s AND t.classroom_id=%s AND s.assessment IS NOT NULL''',
-                                              (self.id, classroom_id))[0][0]
+                                              (self.id, classroom_id))[0]
         except IndexError:
-            return 'NONE'
+            return None
 
     def check_classroom_student(self, classroom_id):
         try:

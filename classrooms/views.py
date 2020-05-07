@@ -81,15 +81,31 @@ def classroom_link_view(message, classroom_id):
     bot.send_message(message.chat.id, text2, parse_mode='HTML')
 
 
-def classroom_assessments_view(message, user, classroom):
-    if type(user) is Student:
-        student = user
-        assessments = student.get_classroom_assessments(classroom.id)
+def classroom_assessments_view(message, student, classroom):
+    assessments = student.get_classroom_assessments(classroom.id)
 
-        text = f"*{classroom.name}*\n\n"
+    text = f"*{classroom.name}*\n\n"
 
-        for assessment in assessments[:-1]:
-            text += f"{assessment}, "
-        text += f"{assessments[-1]}"
-        bot.send_message(message.chat.id, text, parse_mode='Markdown')
-    # TODO add for teachers
+    # TODO add English
+    if assessments:
+        for assessment in assessments:
+            text += f"{assessment[0]} _{assessment[1].strftime('%d.%m.%Y')}_\n" \
+                    f"Оценка: *{assessment[2]}*\n\n"
+    else:
+        text += "Пока нет ни одной оценки"
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+
+
+def task_assessments_view(message, teacher, task):
+    assessments = teacher.get_task_assessments(task.id)
+    print('ASSESS', assessments)
+
+    text = f"*{task.name}* _{task.created_utc.strftime('%d.%m.%Y')}_\n\n"
+
+    # TODO add English
+    if assessments:
+        for assessment in assessments:
+            text += f"{assessment[0]}: *{assessment[1]}*\n\n"
+    else:
+        text += "Пока нет ни одной оценки"
+    bot.send_message(message.chat.id, text, parse_mode='Markdown')
