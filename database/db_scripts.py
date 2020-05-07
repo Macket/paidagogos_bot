@@ -56,7 +56,7 @@ def init_database():
     else:
         commands = [CREATE_TEACHERS_TABLE, CREATE_STUDENTS_TABLE, CREATE_CLASSROOMS_TABLE,
                     CREATE_CLASSROOM_STUDENTS_TABLE, CREATE_TASKS_TABLE, CREATE_TASK_MESSAGES_TABLE,
-                    CREATE_SUBMISSIONS_TABLE, CREATE_SUBMISSION_MESSAGES_TABLE]
+                    CREATE_SUBMISSIONS_TABLE, CREATE_SUBMISSION_MESSAGES_TABLE, CREATE_SUBMISSION_REVIEW_MESSAGES_TABLE]
     for command in commands:
         execute_database_command(command)
     print('bot has been started')
