@@ -98,7 +98,6 @@ def classroom_assessments_view(message, student, classroom):
 
 def task_assessments_view(message, teacher, task):
     assessments = teacher.get_task_assessments(task.id)
-    print('ASSESS', assessments)
 
     text = f"*{task.name}* _{task.created_utc.strftime('%d.%m.%Y')}_\n\n"
 

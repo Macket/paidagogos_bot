@@ -143,11 +143,10 @@ def submission_review_result_view_(user_id, submission_id):
     text = ru_text if user.language_code == 'ru' else en_text
     bot.send_message(user_id, text, parse_mode='Markdown')
 
-    print('SUB', submission)
     review_messages = submission.review_messages
     if review_messages:
         for review_message in review_messages:
-            bot.forward_message(user_id, review_message.from_id, message_id=review_message.message_id)
+            bot.forward_message(user_id, review_message.teacher_id, message_id=review_message.message_id)
     else:
         bot.send_message(user_id, 'Нет комментария')  # TODO add English
 
