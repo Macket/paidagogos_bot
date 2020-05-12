@@ -212,18 +212,28 @@ def submission_assessment_request(message, submission_id):
 
 def submission_assessment_receive(message, submission_id):
     teacher = Teacher.get(message.chat.id)
-    submission = Submission.get(submission_id)
-    submission.assessment = message.text
-    submission.status = SubmissionStatus.REVIEWED.value
-    submission.save()
+    if len(message.text) > 15:
+        ru_text = "Длина оценки не должна превышать 15 символов. Попробуйте ещё раз"
+        en_text = None
+        text = ru_text if teacher.language_code == 'ru' else en_text
+        bot.send_message(message.chat.id,
+                         text,
+                         reply_markup=markups.get_assessment_markup(teacher),
+                         parse_mode='Markdown')
+        bot.register_next_step_handler(message, submission_assessment_receive, submission_id)
+    else:
+        submission = Submission.get(submission_id)
+        submission.assessment = message.text
+        submission.status = SubmissionStatus.REVIEWED.value
+        submission.save()
 
-    ru_text = "Результат проверки отправлен ученику"
-    en_text = None
-    text = ru_text if teacher.language_code == 'ru' else en_text
+        ru_text = "Результат проверки отправлен ученику"
+        en_text = None
+        text = ru_text if teacher.language_code == 'ru' else en_text
 
-    bot.send_message(message.chat.id,
-                     text,
-                     reply_markup=markups.remove_markup(),
-                     parse_mode='Markdown')
-    task_detail_view(message, submission.task_id)
-    new_submission_review_result_notification(submission)
+        bot.send_message(message.chat.id,
+                         text,
+                         reply_markup=markups.remove_markup(),
+                         parse_mode='Markdown')
+        task_detail_view(message, submission.task_id)
+        new_submission_review_result_notification(submission)
