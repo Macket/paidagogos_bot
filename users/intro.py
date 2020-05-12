@@ -38,15 +38,14 @@ def start(message):
                 bot.send_message(message.chat.id, 'Классные комнаты',
                                  reply_markup=user_markups.get_classroom_list_inline_markup(student))
     else:
-        student = Student.get(message.chat.id)
-        if student:
-            ru_text = "Вы уже зарегистрированы как ученик"
+        user = Student.get(message.chat.id) or Teacher.get(message.chat.id)
+        if user:
+            ru_text = "Вы уже зарегистрированы"
             en_text = None
-            text = ru_text if student.language_code == 'ru' else en_text
+            text = ru_text if user.language_code == 'ru' else en_text
 
             bot.send_message(message.chat.id, text)
-            bot.send_message(message.chat.id, 'Классные комнаты',
-                             reply_markup=user_markups.get_classroom_list_inline_markup(student))
+            classroom_list_view(message)
         else:
             # teacher = Teacher(message.chat.id, language_code=message.from_user.language_code)
             Teacher(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
