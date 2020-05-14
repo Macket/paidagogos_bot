@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from users import markups as user_markups
+from classrooms.markups import get_classroom_list_inline_markup
 from classrooms.models import Classroom, ClassroomStudent
 from classrooms.views import classroom_list_view
 from classrooms.scenarios.create_classroom_scenario import classroom_name_request
@@ -19,7 +19,7 @@ def start(message):
 
             bot.send_message(message.chat.id, text)
             bot.send_message(message.chat.id, "Классные комнаты",
-                             reply_markup=user_markups.get_classroom_list_inline_markup(teacher))
+                             reply_markup=get_classroom_list_inline_markup(teacher))
         else:
             student = Student.get(message.chat.id) or \
                       Student(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
@@ -36,7 +36,7 @@ def start(message):
 
                 bot.send_message(message.chat.id, text, parse_mode='Markdown')
                 bot.send_message(message.chat.id, 'Классные комнаты',
-                                 reply_markup=user_markups.get_classroom_list_inline_markup(student))
+                                 reply_markup=get_classroom_list_inline_markup(student))
     else:
         user = Student.get(message.chat.id) or Teacher.get(message.chat.id)
         if user:
