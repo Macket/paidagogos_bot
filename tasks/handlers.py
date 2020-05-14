@@ -80,9 +80,11 @@ def handle_submission_message_list_query(call):
 def handle_submission_review_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
+
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     submission = Submission.get(data['submission_id'])
     task = Task.get(submission.task_id)
+
     submission_message_list_view(user, submission, task)
     submission_comment_request(call.message, data['submission_id'])
 
@@ -91,11 +93,12 @@ def handle_submission_review_query(call):
 def handle_submission_review_result_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    submission_review_result_view(call.message, data['submission_id'])
 
     submission = Submission.get(data['submission_id'])
     task = Task.get(submission.task_id)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+
+    submission_review_result_view(user, submission, task)
     task_detail_view(user, task)
 
 

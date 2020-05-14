@@ -1,6 +1,6 @@
 from bot import bot
 from users.models import Teacher, Student
-from tasks.models import Task, Submission, STATUS_BADGES
+from tasks.models import STATUS_BADGES
 from tasks.markups import get_drawer_markup
 from tasks import markups
 
@@ -87,39 +87,16 @@ def submission_message_list_view(user, submission, task):
             )
 
 
-def submission_review_result_view_(user_id, submission_id):
-    user = Teacher.get(user_id) or Student.get(user_id)
-    submission = Submission.get(submission_id)
-    task = Task.get(submission.task_id)
-
-    ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
-              f"Комментарий учителя👇🏻"
-    en_text = None
-    text = ru_text if user.language_code == 'ru' else en_text
-    bot.send_message(user_id, text, parse_mode='Markdown')
-
-    review_messages = submission.review_messages
-    if review_messages:
-        for review_message in review_messages:
-            bot.forward_message(user_id, review_message.teacher_id, message_id=review_message.message_id)
-    else:
-        bot.send_message(user_id, 'Нет комментария')  # TODO add English
-
-
-def submission_review_result_view(message, submission_id):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    submission = Submission.get(submission_id)
-    task = Task.get(submission.task_id)
-
+def submission_review_result_view(user, submission, task):
     ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
               f"Комментарии учителя👇🏻"
     en_text = None
     text = ru_text if user.language_code == 'ru' else en_text
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(user.id, text, parse_mode='Markdown')
 
     review_messages = submission.review_messages
     if review_messages:
         for review_message in review_messages:
-            bot.forward_message(message.chat.id, review_message.teacher_id, message_id=review_message.message_id)
+            bot.forward_message(user.id, review_message.teacher_id, message_id=review_message.message_id)
     else:
-        bot.send_message(message.chat.id, 'Нет комментария')  # TODO add English
+        bot.send_message(user.id, 'Нет комментария')  # TODO add English
