@@ -10,13 +10,15 @@ from utils.scripts import get_call_data
 
 @bot.message_handler(commands=['classrooms'])
 def handle_classrooms_command(message):
-    classroom_list_view(message)
+    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+    classroom_list_view(message, user)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOMS/'))
 def handle_classrooms_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
-    classroom_list_view(call.message, edit=True)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom_list_view(call.message, user, edit=True)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM/'))
@@ -92,4 +94,4 @@ def classroom_name_receive(message):
     classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
 
     classroom_link_view(message, classroom.id)
-    classroom_list_view(message)
+    classroom_list_view(message, teacher)

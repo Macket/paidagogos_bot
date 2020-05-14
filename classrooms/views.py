@@ -5,8 +5,7 @@ from classrooms.models import Classroom
 from classrooms import markups
 
 
-def classroom_list_view(message, edit=False):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
+def classroom_list_view(message, user, edit=False):
     text = '*Классные комнаты*' if user.language_code == 'ru' else '*Classrooms*'
     if edit:
         bot.edit_message_text(

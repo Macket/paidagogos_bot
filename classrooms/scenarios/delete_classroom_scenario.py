@@ -25,4 +25,4 @@ def are_you_sure_receive(message, teacher, classroom):
         text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text, reply_markup=ReplyKeyboardRemove(), parse_mode='Markdown')
-    classroom_list_view(message)
+    classroom_list_view(message, teacher)

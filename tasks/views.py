@@ -162,7 +162,6 @@ def submission_review_result_view(message, submission_id):
     text = ru_text if user.language_code == 'ru' else en_text
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
 
-    print('SUB', submission)
     review_messages = submission.review_messages
     if review_messages:
         for review_message in review_messages:
