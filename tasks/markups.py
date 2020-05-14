@@ -29,10 +29,6 @@ def get_compose_submission_markup(teacher):
     return markup
 
 
-def remove_markup():
-    return types.ReplyKeyboardRemove()
-
-
 def get_task_list_inline_markup(user, classroom):
     inline_markup = types.InlineKeyboardMarkup(row_width=1)
 

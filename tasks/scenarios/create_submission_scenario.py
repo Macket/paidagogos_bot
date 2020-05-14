@@ -1,5 +1,6 @@
 from bot import bot
 from tasks import markups
+from utils.markups import remove_markup
 from tasks.models import Task, SubmissionStatus
 from tasks.views import task_detail_view
 from users.models import Student
@@ -14,13 +15,13 @@ def compose_submission(message, submission):
         bot.send_message(
             message.chat.id,
             'Ваше задание отправлено, ждите результата',
-            reply_markup=markups.remove_markup()
+            reply_markup=remove_markup()
         )  # TODO add English
 
         task = Task.get(submission.task_id)
         task_detail_view(student, task)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
+        bot.send_message(message.chat.id, 'Отмена', reply_markup=remove_markup())  # TODO add English
 
         task = Task.get(submission.task_id)
         task_detail_view(student, task)

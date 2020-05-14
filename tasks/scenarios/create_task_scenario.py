@@ -3,6 +3,7 @@ from bot import bot
 from classrooms.models import Classroom
 from classrooms.views import classroom_detail_view
 from tasks import markups
+from utils.markups import remove_markup
 from tasks.models import Task
 from tasks.notifications import new_task_notification
 from users.models import Teacher
@@ -41,14 +42,14 @@ def task_name_receive(message, classroom_id):
 def compose_task(message, task):
     teacher = Teacher.get(message.chat.id)
     if message.text in ['Выдать задание', 'Assign task']:
-        bot.send_message(message.chat.id, 'Задание выдано вашим ученикам', reply_markup=markups.remove_markup())  # TODO add English
+        bot.send_message(message.chat.id, 'Задание выдано вашим ученикам', reply_markup=remove_markup())  # TODO add English
 
         classroom = Classroom.get(task.classroom_id)
         classroom_detail_view(teacher, classroom)
 
         new_task_notification(task)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
+        bot.send_message(message.chat.id, 'Отмена', reply_markup=remove_markup())  # TODO add English
 
         classroom = Classroom.get(task.classroom_id)
         classroom_detail_view(teacher, classroom)

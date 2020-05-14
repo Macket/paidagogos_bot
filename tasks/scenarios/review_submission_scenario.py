@@ -1,6 +1,7 @@
 from _datetime import datetime, timezone
 from bot import bot
 from tasks import markups
+from utils.markups import remove_markup
 from tasks.models import Task, SubmissionReviewMessage, Submission, SubmissionStatus
 from tasks.notifications import new_submission_review_result_notification
 from tasks.views import task_detail_view
@@ -64,7 +65,7 @@ def submission_assessment_receive(message, submission_id):
 
         bot.send_message(message.chat.id,
                          text,
-                         reply_markup=markups.remove_markup(),
+                         reply_markup=remove_markup(),
                          parse_mode='Markdown')
         task = Task.get(submission.task_id)
         task_detail_view(teacher, task)
