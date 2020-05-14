@@ -44,7 +44,7 @@ def task_message_list_view(user, task):
     text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else 'Content of the task: *{task.name}*'
     bot.send_message(user.id, text, parse_mode='Markdown')
     for task_message in task.messages:
-        message = bot.forward_message(message.chat.id, task_message.teacher_id, task_message.message_id)
+        bot.forward_message(user.id, task_message.teacher_id, task_message.message_id)
 
 
 def submission_list_view(teacher, task, message_to_edit=None):
