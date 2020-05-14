@@ -3,7 +3,7 @@ from users.models import Teacher, Student
 from users import markups as user_markups
 from classrooms.models import Classroom, ClassroomStudent
 from classrooms.views import classroom_list_view
-from classrooms.handlers import classroom_name_request
+from classrooms.scenarios.create_classroom_scenario import classroom_name_request
 from datetime import datetime, timezone
 
 
