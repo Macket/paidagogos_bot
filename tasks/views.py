@@ -40,12 +40,9 @@ def task_detail_view(user, task, message_to_edit=None):
             parse_mode='Markdown')
 
 
-def task_message_list_view(message, task_id):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    task = Task.get(task_id)
-
+def task_message_list_view(user, task):
     text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else 'Content of the task: *{task.name}*'
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(user.id, text, parse_mode='Markdown')
     for task_message in task.messages:
         message = bot.forward_message(message.chat.id, task_message.teacher_id, task_message.message_id)
 

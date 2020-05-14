@@ -33,11 +33,10 @@ def handle_task_query(call):
 def handle_task_messages_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    task_message_list_view(call.message, data['task_id'])
-
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     task = Task.get(data['task_id'])
-    task_detail_view(user, task, message_to_edit=call.message)
+    task_message_list_view(user, task)
+    task_detail_view(user, task)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_TASK/'))
