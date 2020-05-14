@@ -47,7 +47,6 @@ def task_message_list_view(user, task):
         message = bot.forward_message(message.chat.id, task_message.teacher_id, task_message.message_id)
 
 
-# TODO изменить название функции
 def submission_list_view(teacher, task, message_to_edit=None):
     text = f"*{task.name}*. Задания на проверку" if \
         teacher.language_code == 'ru' else f"*{task.name}*. Submissions for review"
@@ -66,17 +65,14 @@ def submission_list_view(teacher, task, message_to_edit=None):
             parse_mode='Markdown')
 
 
-def submission_message_list_view(message, submission_id):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    submission = Submission.get(submission_id)
-    task = Task.get(submission.task_id)
+def submission_message_list_view(user, submission, task):
     student = Student.get(submission.student_id)
 
     text = f"Выполненное задание: *{task.name}*. Ученик: _{student.fullname}_" if \
         user.language_code == 'ru' else 'Submission: *{task.name}*. Student: _{student.fullname}_'
-    bot.send_message(message.chat.id, text, parse_mode='Markdown')
+    bot.send_message(user.id, text, parse_mode='Markdown')
     for submission_message in submission.messages:
-        message = bot.forward_message(message.chat.id, submission_message.student_id, submission_message.message_id)
+        message = bot.forward_message(user.id, submission_message.student_id, submission_message.message_id)
         if type(user) is Teacher and message.photo:
             bot.delete_message(message.chat.id, message.message_id)
             message_with_button = bot.send_photo(
@@ -87,7 +83,7 @@ def submission_message_list_view(message, submission_id):
                 user.id,
                 'Нажмите, чтобы исправить ошибки👇🏻',  # TODO add English
                 reply_markup=get_drawer_markup(message.photo[-1].file_id, message.chat.id,
-                                                            message_with_button.message_id, submission_id)
+                                               message_with_button.message_id, submission.id)
             )
 
 
