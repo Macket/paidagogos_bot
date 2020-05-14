@@ -15,14 +15,18 @@ from utils.scripts import get_call_data
 def handle_tasks_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    task_list_view(call.message, data['classroom_id'], edit=True)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom = Classroom.get(data['classroom_id'])
+    task_list_view(user, classroom, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
 def handle_task_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    task_detail_view(call.message, data['task_id'], edit=True)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    task = Task.get(data['task_id'])
+    task_detail_view(user, task, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK_MESSAGES/'))
@@ -30,7 +34,10 @@ def handle_task_messages_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_message_list_view(call.message, data['task_id'])
-    task_detail_view(call.message, data['task_id'])
+
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    task = Task.get(data['task_id'])
+    task_detail_view(user, task, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_TASK/'))
@@ -44,7 +51,9 @@ def handle_new_task_query(call):
 def handle_submissions_for_review_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    submission_list_view(call.message, data['task_id'], edit=True)
+    teacher = Teacher.get(call.message.chat.id)
+    task = Task.get(data['task_id'])
+    submission_list_view(teacher, task, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS_REVIEWED/'))
@@ -54,7 +63,7 @@ def handle_submissions_reviewed_query(call):
     teacher = Teacher.get(call.message.chat.id)
     task = Task.get(data['task_id'])
     task_assessments_view(teacher, task)
-    task_detail_view(call.message, task.id)
+    task_detail_view(teacher, task)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_MESSAGES/'))
@@ -62,8 +71,11 @@ def handle_submission_message_list_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_message_list_view(call.message, data['submission_id'])
+
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     submission = Submission.get(data['submission_id'])
-    task_detail_view(call.message, submission.task_id)
+    task = Task.get(submission.task_id)
+    task_detail_view(user, task, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW/'))
@@ -79,9 +91,11 @@ def handle_submission_review_result_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     submission_review_result_view(call.message, data['submission_id'])
+
     submission = Submission.get(data['submission_id'])
     task = Task.get(submission.task_id)
-    task_detail_view(call.message, task.id)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    task_detail_view(user, task)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_SUBMISSION/'))
@@ -161,17 +175,22 @@ def compose_task(message, task):
 
 
 def compose_submission(message, submission):
+    student = Student.get(message.chat.id)
+
     if message.text in ['Отправить на проверку', 'Submit for review']:
         submission.status = SubmissionStatus.REVIEW.value
         submission.save()
         bot.send_message(message.chat.id, 'Ваше задание отправлено, ждите результата', reply_markup=markups.remove_markup())  # TODO add English
-        task_detail_view(message, submission.task_id)
+
+        task = Task.get(submission.task_id)
+        task_detail_view(student, task)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
         bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
-        task_detail_view(message, submission.task_id)
+
+        task = Task.get(submission.task_id)
+        task_detail_view(student, task)
         submission.delete()
     else:
-        student = Student.get(message.chat.id)
         submission.add(message)
         bot.send_message(
             message.chat.id,
@@ -241,5 +260,6 @@ def submission_assessment_receive(message, submission_id):
                          text,
                          reply_markup=markups.remove_markup(),
                          parse_mode='Markdown')
-        task_detail_view(message, submission.task_id)
+        task = Task.get(submission.task_id)
+        task_detail_view(teacher, task)
         new_submission_review_result_notification(submission)

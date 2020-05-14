@@ -2,7 +2,7 @@ from bot import bot
 from users.models import Teacher, Student
 from classrooms.models import Classroom
 from tasks.models import Task
-from tasks.views import task_detail_view_, submission_list_view_, submission_review_result_view_
+from tasks.views import task_detail_view, submission_review_result_view_
 
 
 def new_task_notification(task):
@@ -16,7 +16,7 @@ def new_task_notification(task):
     for student in students:
         text = ru_text if student.language_code == 'ru' else en_text
         bot.send_message(student.id, text, parse_mode='MarkDown')
-        task_detail_view_(student.id, task.id)
+        task_detail_view(student, task)
 
 
 def new_submission_review_result_notification(submission):
@@ -31,4 +31,4 @@ def new_submission_review_result_notification(submission):
 
     bot.send_message(student.id, text, parse_mode='MarkDown')
     submission_review_result_view_(student.id, submission.id)
-    task_detail_view_(student.id, task.id)
+    task_detail_view(student, task)
