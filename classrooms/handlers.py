@@ -30,29 +30,27 @@ def handle_classroom_query(call):
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_STUDENTS/'))
-def handle_classroom_query(call):
+def handle_classroom_students_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    classroom_student_list_view(call.message, data['classroom_id'])
-
-    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    teacher = Teacher.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
-    classroom_detail_view(user, classroom)
+    classroom_student_list_view(teacher, classroom)
+    classroom_detail_view(teacher, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_LINK/'))
-def handle_classroom_query(call):
+def handle_classroom_link_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    classroom_link_view(call.message, data['classroom_id'])
-
-    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    teacher = Teacher.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
-    classroom_detail_view(user, classroom)
+    classroom_link_view(teacher, classroom)
+    classroom_detail_view(teacher, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_RENAME/'))
-def handle_classroom_query(call):
+def handle_classroom_rename_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom = Classroom.get(data['classroom_id'])
@@ -75,7 +73,7 @@ def handle_classroom_assessments_query(call):
     data = get_call_data(call)
     student = Student.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
-    classroom_assessments_view(call.message, student, classroom)
+    classroom_assessments_view(student, classroom)
     classroom_detail_view(student, classroom)
 
 

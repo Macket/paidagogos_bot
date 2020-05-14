@@ -20,5 +20,5 @@ def classroom_name_receive(message):
     teacher = Teacher.get(message.chat.id)
     classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
 
-    classroom_link_view(message, classroom.id)
+    classroom_link_view(teacher, classroom)
     classroom_list_view(teacher)

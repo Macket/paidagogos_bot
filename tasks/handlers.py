@@ -12,7 +12,7 @@ from utils.scripts import get_call_data
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASKS/'))
-def handle_task_query(call):
+def handle_tasks_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     task_list_view(call.message, data['classroom_id'], edit=True)
@@ -48,12 +48,12 @@ def handle_submissions_for_review_query(call):
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS_REVIEWED/'))
-def handle_submissions_for_review_query(call):
+def handle_submissions_reviewed_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     teacher = Teacher.get(call.message.chat.id)
     task = Task.get(data['task_id'])
-    task_assessments_view(call.message, teacher, task)
+    task_assessments_view(teacher, task)
     task_detail_view(call.message, task.id)
 
 
