@@ -12,7 +12,6 @@ from utils.scripts import get_call_data
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASKS/'))
 def handle_tasks_query(call):
-    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
@@ -21,7 +20,6 @@ def handle_tasks_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@TASK/'))
 def handle_task_query(call):
-    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     task = Task.get(data['task_id'])
@@ -47,7 +45,6 @@ def handle_new_task_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSIONS_FOR_REVIEW/'))
 def handle_submissions_for_review_query(call):
-    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     teacher = Teacher.get(call.message.chat.id)
     task = Task.get(data['task_id'])
@@ -72,7 +69,7 @@ def handle_submission_message_list_query(call):
     submission = Submission.get(data['submission_id'])
     task = Task.get(submission.task_id)
     submission_message_list_view(user, submission, task)
-    task_detail_view(user, task, message_to_edit=call.message)
+    task_detail_view(user, task)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@SUBMISSION_REVIEW/'))

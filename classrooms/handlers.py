@@ -15,14 +15,12 @@ def handle_classrooms_command(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOMS/'))
 def handle_classrooms_query(call):
-    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     classroom_list_view(user, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM/'))
 def handle_classroom_query(call):
-    bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])

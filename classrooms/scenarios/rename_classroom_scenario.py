@@ -16,4 +16,4 @@ def classroom_name_receive(message, classroom):
     teacher = Teacher.get(message.chat.id)
     classroom.name = message.text
     classroom.save()
-    classroom_detail_view(teacher, classroom, message_to_edit=message)
+    classroom_detail_view(teacher, classroom)
