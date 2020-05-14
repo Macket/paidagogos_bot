@@ -1,5 +1,6 @@
 from bot import bot
 from classrooms.views import classroom_detail_view
+from users.models import Teacher
 
 
 def classroom_name_request(message, teacher, classroom):
@@ -12,6 +13,7 @@ def classroom_name_request(message, teacher, classroom):
 
 
 def classroom_name_receive(message, classroom):
+    teacher = Teacher.get(message.chat.id)
     classroom.name = message.text
     classroom.save()
-    classroom_detail_view(message, classroom.id)
+    classroom_detail_view(teacher, classroom, message_to_edit=message)

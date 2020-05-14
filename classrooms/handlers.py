@@ -11,21 +11,23 @@ from utils.scripts import get_call_data
 @bot.message_handler(commands=['classrooms'])
 def handle_classrooms_command(message):
     user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    classroom_list_view(message, user)
+    classroom_list_view(user)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOMS/'))
 def handle_classrooms_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
-    classroom_list_view(call.message, user, edit=True)
+    classroom_list_view(user, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM/'))
 def handle_classroom_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
-    classroom_detail_view(call.message, data['classroom_id'], edit=True)
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom = Classroom.get(data['classroom_id'])
+    classroom_detail_view(user, classroom, message_to_edit=call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_STUDENTS/'))
@@ -33,7 +35,10 @@ def handle_classroom_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom_student_list_view(call.message, data['classroom_id'])
-    classroom_detail_view(call.message, data['classroom_id'])
+
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom = Classroom.get(data['classroom_id'])
+    classroom_detail_view(user, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_LINK/'))
@@ -41,7 +46,10 @@ def handle_classroom_query(call):
     bot.clear_step_handler_by_chat_id(call.message.chat.id)
     data = get_call_data(call)
     classroom_link_view(call.message, data['classroom_id'])
-    classroom_detail_view(call.message, data['classroom_id'])
+
+    user = Teacher.get(call.message.chat.id) or Student.get(call.message.chat.id)
+    classroom = Classroom.get(data['classroom_id'])
+    classroom_detail_view(user, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@CLASSROOM_RENAME/'))
@@ -69,7 +77,7 @@ def handle_classroom_assessments_query(call):
     student = Student.get(call.message.chat.id)
     classroom = Classroom.get(data['classroom_id'])
     classroom_assessments_view(call.message, student, classroom)
-    classroom_detail_view(call.message, classroom.id)
+    classroom_detail_view(student, classroom)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('@@NEW_CLASSROOM/'))
@@ -94,4 +102,4 @@ def classroom_name_receive(message):
     classroom = Classroom(teacher.id, message.text, created_utc=datetime.now(timezone.utc)).save()
 
     classroom_link_view(message, classroom.id)
-    classroom_list_view(message, teacher)
+    classroom_list_view(teacher)

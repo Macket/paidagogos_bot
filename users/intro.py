@@ -45,7 +45,7 @@ def start(message):
             text = ru_text if user.language_code == 'ru' else en_text
 
             bot.send_message(message.chat.id, text)
-            classroom_list_view(message, user)
+            classroom_list_view(user)
         else:
             # teacher = Teacher(message.chat.id, language_code=message.from_user.language_code)
             Teacher(message.chat.id, language_code='ru', registered_utc=datetime.now(timezone.utc)).save()
@@ -98,4 +98,4 @@ def student_fullname_receive(message):
 
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
 
-    classroom_list_view(message, student)
+    classroom_list_view(student)

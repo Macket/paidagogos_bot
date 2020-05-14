@@ -5,37 +5,34 @@ from classrooms.models import Classroom
 from classrooms import markups
 
 
-def classroom_list_view(message, user, edit=False):
+def classroom_list_view(user, message_to_edit=None):
     text = '*Классные комнаты*' if user.language_code == 'ru' else '*Classrooms*'
-    if edit:
+    if message_to_edit:
         bot.edit_message_text(
             text,
-            chat_id=message.chat.id,
-            message_id=message.message_id,
+            chat_id=user.id,
+            message_id=message_to_edit.message_id,
             reply_markup=markups.get_classroom_list_inline_markup(user),
             parse_mode='Markdown')
     else:
         bot.send_message(
-            message.chat.id,
+            user.id,
             text,
             reply_markup=markups.get_classroom_list_inline_markup(user),
             parse_mode='Markdown')
 
 
-def classroom_detail_view(message, classroom_id, edit=False):
-    user = Teacher.get(message.chat.id) or Student.get(message.chat.id)
-    classroom = Classroom.get(classroom_id)
-
-    if edit:
+def classroom_detail_view(user, classroom, message_to_edit=None):
+    if message_to_edit:
         bot.edit_message_text(
             f'*{classroom.name}*',
-            chat_id=message.chat.id,
-            message_id=message.message_id,
+            chat_id=user.id,
+            message_id=message_to_edit.message_id,
             reply_markup=markups.get_classroom_detail_inline_markup(user, classroom),
             parse_mode='Markdown')
     else:
         bot.send_message(
-            message.chat.id,
+            user.id,
             f'*{classroom.name}*',
             reply_markup=markups.get_classroom_detail_inline_markup(user, classroom),
             parse_mode='Markdown')

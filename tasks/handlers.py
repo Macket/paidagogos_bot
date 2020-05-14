@@ -1,4 +1,5 @@
 from bot import bot
+from classrooms.models import Classroom
 from users.models import Teacher, Student
 from tasks.models import Task, Submission, SubmissionStatus, SubmissionReviewMessage
 from tasks import markups
@@ -134,16 +135,21 @@ def task_name_receive(message, classroom_id):
 
 
 def compose_task(message, task):
+    teacher = Teacher.get(message.chat.id)
     if message.text in ['Выдать задание', 'Assign task']:
         bot.send_message(message.chat.id, 'Задание выдано вашим ученикам', reply_markup=markups.remove_markup())  # TODO add English
-        classroom_detail_view(message, task.classroom_id)
+
+        classroom = Classroom.get(task.classroom_id)
+        classroom_detail_view(teacher, classroom)
+
         new_task_notification(task)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
         bot.send_message(message.chat.id, 'Отмена', reply_markup=markups.remove_markup())  # TODO add English
-        classroom_detail_view(message, task.classroom_id)
+
+        classroom = Classroom.get(task.classroom_id)
+        classroom_detail_view(teacher, classroom)
         task.delete()
     else:
-        teacher = Teacher.get(message.chat.id)
         task.add(message)
         bot.send_message(
             message.chat.id,
