@@ -91,7 +91,7 @@ So Karl can see her in the students list now.
 
 ![4](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/4.png)
 
-To create the new task for Sofya, Karl taps **Tasks** and sends the name of the task.
+To create the new task for Sofya, Karl goes to **Tasks**, taps **New task** and sends the name of the task.
 
 ![5](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/5.png)
 
@@ -115,7 +115,7 @@ Send her solution in any format.
 
 ![10](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/10.png)
 
-And submit for Karl's review
+And submit for Karl's review.
 
 ![11](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/11.png)
 
@@ -135,7 +135,7 @@ If Paidagogos Bot is used in conjunction with a [Paidagogos Drawer](https://gith
 
 ![demo](https://raw.githubusercontent.com/Macket/paidagogos_drawer/master/videos/readme/demo.gif)
 
-As review is done Karl has the photo with his notes in the bot
+As review is done Karl has the photo with his notes in the bot.
 
 ![15](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/15.png)
 
@@ -143,6 +143,6 @@ Then he writes comments for Sofya and rates her.
 
 ![16](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/16.png)
 
-After that Sofya get notified that her submission is reviewed and can see the result.
+After that Sofya gets notified that her submission is reviewed and can see the result.
 
 ![17](https://raw.githubusercontent.com/Macket/paidagogos_bot/master/img/readme/17.png)
