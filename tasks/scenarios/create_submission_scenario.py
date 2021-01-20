@@ -12,26 +12,37 @@ def compose_submission(message, submission):
     if message.text in ['Отправить на проверку', 'Submit for review']:
         submission.status = SubmissionStatus.REVIEW.value
         submission.save()
-        bot.send_message(
-            message.chat.id,
-            'Ваше задание отправлено, ждите результата',
-            reply_markup=remove_markup()
-        )  # TODO add English
+
+        ru_text = "Ваше задание отправлено, ждите результата"
+        en_text = "Your submission is sent, wait for the review result"
+        text = ru_text if student.language_code == 'ru' else en_text
+
+        bot.send_message(message.chat.id, text, reply_markup=remove_markup())
 
         task = Task.get(submission.task_id)
         task_detail_view(student, task)
     elif message.text in ['❌ Отмена', '❌ Cancel']:
-        bot.send_message(message.chat.id, 'Отмена', reply_markup=remove_markup())  # TODO add English
+        ru_text = "Отмена"
+        en_text = "Cancel"
+        text = ru_text if student.language_code == 'ru' else en_text
+
+        bot.send_message(message.chat.id, text, reply_markup=remove_markup())
 
         task = Task.get(submission.task_id)
         task_detail_view(student, task)
         submission.delete()
     else:
         submission.add(message)
+
+        ru_text = "Отправьте ещё что-то или нажмите *Отправить на проверку*"
+        en_text = "Send something else or tap *Submit for review*"
+        text = ru_text if student.language_code == 'ru' else en_text
+
         bot.send_message(
             message.chat.id,
-            'Отправьте ещё что-то или нажмите *Отправить на проверку*',
+            text,
             reply_markup=markups.get_compose_submission_markup(student),
             parse_mode='Markdown',
-        )  # TODO add English
+        )
+
         bot.register_next_step_handler(message, compose_submission, submission)

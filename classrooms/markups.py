@@ -1,4 +1,5 @@
 from telebot import types
+import settings
 from users.models import Teacher
 
 
@@ -35,7 +36,7 @@ def get_classroom_detail_inline_markup(user, classroom):
                 callback_data='@@TASKS/{"classroom_id": ' + str(classroom.id) + '}'
             ),
             types.InlineKeyboardButton(
-                text="Список учеников" if user.language_code == 'ru' else 'Classroom students',
+                text="Список учеников" if user.language_code == 'ru' else 'Students',
                 callback_data='@@CLASSROOM_STUDENTS/{"classroom_id": ' + str(classroom.id) + '}'
             ),
             types.InlineKeyboardButton(
@@ -83,3 +84,17 @@ def are_you_sure_markup(teacher):
     markup = ru_markup if teacher.language_code == 'ru' else en_markup
 
     return markup
+
+
+def join_classroom_markup(teacher, classroom):
+    url = f'https://t.me/remote_learning_bot?start=slug-{classroom.slug}' if settings.DEBUG \
+        else f'https://t.me/paidagogos_bot?start=slug-{classroom.slug}'
+
+    ru_text = "Присоединиться"
+    en_text = "Join"
+    text = ru_text if teacher.language_code == 'ru' else en_text
+
+    inline_markup = types.InlineKeyboardMarkup(row_width=1)
+    inline_markup.add(types.InlineKeyboardButton(text=text, url=url))
+
+    return inline_markup

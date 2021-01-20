@@ -8,9 +8,14 @@ def new_photo(message):
     teacher = Teacher.get(message.chat.id)
     if teacher:
         bot.delete_message(message.chat.id, message.message_id)
+
+        ru_text = "Нажмите, чтобы исправить ошибки 👇🏻"
+        en_text = "Tap to review 👇🏻"
+        text = ru_text if teacher.language_code == 'ru' else en_text
+
         bot.send_photo(
             teacher.id,
             message.photo[-1].file_id,
-            caption='Нажмите, чтобы исправить ошибки👇🏻',  # TODO add English
-            reply_markup=get_drawer_markup(message.photo[-1].file_id, message.chat.id)
+            caption=text,
+            reply_markup=get_drawer_markup(message.photo[-1].file_id, teacher)
         )

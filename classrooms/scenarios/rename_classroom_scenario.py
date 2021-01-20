@@ -4,8 +4,8 @@ from users.models import Teacher
 
 
 def classroom_name_request(message, teacher, classroom):
-    ru_text = f"Отправьте новое название класса"
-    en_text = None
+    ru_text = "Отправьте новое название класса"
+    en_text = "Send the name of the classroom"
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text)

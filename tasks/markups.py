@@ -191,19 +191,20 @@ def get_assessment_markup(teacher):
     return markup
 
 
-def get_drawer_markup(file_id, chat_id, message_id=None, submission_id=None):
-    inline_markup = types.InlineKeyboardMarkup(row_width=1)
+def get_drawer_markup(file_id, teacher, message_id=None, submission_id=None):
 
-    url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&chat_id={chat_id}' if settings.DEBUG \
-        else f'https://paidagogos-drawer.herokuapp.com//drawer/?file_id={file_id}&chat_id={chat_id}'
+    url = f'http://127.0.0.1:5000/drawer/?file_id={file_id}&chat_id={teacher.id}' if settings.DEBUG \
+        else f'https://paidagogos-drawer.herokuapp.com//drawer/?file_id={file_id}&chat_id={teacher.id}'
     if message_id:
         url += f'&message_id={message_id}'
     if submission_id:
         url += f'&submission_id={submission_id}'
 
-    inline_markup.add(
-        #  TODO add English
-        types.InlineKeyboardButton(text='Исправить ошибки', url=url),
-    )
+    ru_text = "Исправить ошибки"
+    en_text = "Review"
+    text = ru_text if teacher.language_code == 'ru' else en_text
+
+    inline_markup = types.InlineKeyboardMarkup(row_width=1)
+    inline_markup.add(types.InlineKeyboardButton(text=text, url=url))
 
     return inline_markup

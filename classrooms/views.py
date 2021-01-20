@@ -1,7 +1,7 @@
 import settings
 from bot import bot
 from users.models import Student
-from classrooms import markups
+from classrooms.markups import *
 
 
 def classroom_list_view(user, message_to_edit=None):
@@ -11,13 +11,13 @@ def classroom_list_view(user, message_to_edit=None):
             text,
             chat_id=user.id,
             message_id=message_to_edit.message_id,
-            reply_markup=markups.get_classroom_list_inline_markup(user),
+            reply_markup=get_classroom_list_inline_markup(user),
             parse_mode='Markdown')
     else:
         bot.send_message(
             user.id,
             text,
-            reply_markup=markups.get_classroom_list_inline_markup(user),
+            reply_markup=get_classroom_list_inline_markup(user),
             parse_mode='Markdown')
 
 
@@ -27,21 +27,21 @@ def classroom_detail_view(user, classroom, message_to_edit=None):
             f'*{classroom.name}*',
             chat_id=user.id,
             message_id=message_to_edit.message_id,
-            reply_markup=markups.get_classroom_detail_inline_markup(user, classroom),
+            reply_markup=get_classroom_detail_inline_markup(user, classroom),
             parse_mode='Markdown')
     else:
         bot.send_message(
             user.id,
             f'*{classroom.name}*',
-            reply_markup=markups.get_classroom_detail_inline_markup(user, classroom),
+            reply_markup=get_classroom_detail_inline_markup(user, classroom),
             parse_mode='Markdown')
 
 
 def classroom_student_list_view(teacher, classroom):
     students = Student.get_classroom_students(classroom.id)
     if len(students) == 0:
-        ru_text = 'В этой классной комнате пока что нет ни одного ученика'
-        en_text = None
+        ru_text = "В этой классной комнате пока что нет ни одного ученика"
+        en_text = "There are no students in this classroom yet"
         text = ru_text if teacher.language_code == 'ru' else en_text
     else:
         text = f"*{classroom.name}*\n\n"
@@ -52,38 +52,31 @@ def classroom_student_list_view(teacher, classroom):
 
 
 def classroom_link_view(teacher, classroom):
-    url_ru = f'https://t-do.ru/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
-        else f'https://t-do.ru/paidagogos_bot?start=slug-{classroom.slug}'
-
-    url = f'https://t.me/BotoKatalabot?start=slug-{classroom.slug}' if settings.DEBUG \
-        else f'https://t.me/paidagogos_bot?start=slug-{classroom.slug}'
-
-    ru_text1 = "Вот приглашение в вашу классную комнату. Отправьте его своим ученикам"
-    en_text1 = None  # TODO add English
+    ru_text1 = "Вот приглашение в вашу классную комнату 👇🏻 \n\nОтправьте его своим ученикам"
+    en_text1 = "Below is an invitation to your classroom 👇🏻 \n\n Send it to your students."
     text1 = ru_text1 if teacher.language_code == 'ru' else en_text1
 
-    ru_text2 = f"Учитель <i>{teacher.fullname}</i> приглашает вас в классную комнату <b>{classroom.name}</b>.\n\n" \
-               f"<b>Ссылка для компьютера</b>: {url_ru}\n\n" \
-               f"<b>Ссылка для телефона</b>: {url}\n"
-    en_text2 = None
-    text2 = ru_text2 if teacher.language_code == 'ru' else en_text2
-
     bot.send_message(teacher.id, text1)
-    bot.send_message(teacher.id, text2, parse_mode='HTML')
+
+    ru_text2 = f"Учитель <i>{teacher.fullname}</i> приглашает вас в классную комнату <b>{classroom.name}</b>.\n\n"
+    en_text2 = f"Teacher <i>{teacher.fullname}</i> invites you to the classroom <b>{classroom.name}</b>.\n\n"
+    text2 = ru_text2 if teacher.language_code == 'ru' else en_text2
+    
+    bot.send_message(teacher.id, text2, reply_markup=join_classroom_markup(teacher, classroom), parse_mode='HTML')
 
 
 def classroom_assessments_view(student, classroom):
     assessments = student.get_classroom_assessments(classroom.id)
 
     text = f"*{classroom.name}*\n\n"
+    rate_word = "Оценка" if student.language_code == 'ru' else "Rate"
 
-    # TODO add English
     if assessments:
         for assessment in assessments:
             text += f"{assessment[0]} _{assessment[1].strftime('%d.%m.%Y')}_\n" \
-                    f"Оценка: *{assessment[2]}*\n\n"
+                    f"{rate_word}: *{assessment[2]}*\n\n"
     else:
-        text += "Пока нет ни одной оценки"
+        text += "Пока нет ни одной оценки" if student.language_code == 'ru' else "There are no rates yet"
     bot.send_message(student.id, text, parse_mode='Markdown')
 
 
@@ -92,10 +85,9 @@ def task_assessments_view(teacher, task):
 
     text = f"*{task.name}* _{task.created_utc.strftime('%d.%m.%Y')}_\n\n"
 
-    # TODO add English
     if assessments:
         for assessment in assessments:
             text += f"{assessment[0]}: *{assessment[1]}*\n\n"
     else:
-        text += "Пока нет ни одной оценки"
+        text += "Пока нет ни одной оценки" if teacher.language_code == 'ru' else "There are no rates yet"
     bot.send_message(teacher.id, text, parse_mode='Markdown')

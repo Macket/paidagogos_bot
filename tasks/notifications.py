@@ -11,7 +11,7 @@ def new_task_notification(task):
     students = Student.get_classroom_students(classroom.id)
 
     ru_text = f"🔔 Новое задание: *{task.name}*\n\n*{classroom.name}*. Учитель: _{teacher.fullname}_"
-    en_text = None
+    en_text = f"🔔 New task: *{task.name}*\n\n*{classroom.name}*. Teacher: _{teacher.fullname}_"
 
     for student in students:
         text = ru_text if student.language_code == 'ru' else en_text
@@ -26,7 +26,7 @@ def new_submission_review_result_notification(submission):
     teacher = Teacher.get(classroom.teacher_id)
 
     ru_text = f"🔔 Ваше задание проверено\n\n*{classroom.name}*\n_{teacher.fullname}_"
-    en_text = None
+    en_text = f"🔔 New submission review\n\n*{classroom.name}*\n_{teacher.fullname}_"
     text = ru_text if student.language_code == 'ru' else en_text
 
     bot.send_message(student.id, text, parse_mode='MarkDown')

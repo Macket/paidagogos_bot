@@ -12,7 +12,7 @@ def submission_comment_request(message, submission_id):
     teacher = Teacher.get(message.chat.id)
 
     ru_text = "Прокомментируйте задание, отправив любое сообщение"
-    en_text = None
+    en_text = "Comment submission by sending any message"
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id,
@@ -32,7 +32,7 @@ def submission_assessment_request(message, submission_id):
     teacher = Teacher.get(message.chat.id)
 
     ru_text = "Поставьте оценку"
-    en_text = None
+    en_text = "Rate submission"
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id,
@@ -46,7 +46,7 @@ def submission_assessment_receive(message, submission_id):
     teacher = Teacher.get(message.chat.id)
     if len(message.text) > 15:
         ru_text = "Длина оценки не должна превышать 15 символов. Попробуйте ещё раз"
-        en_text = None
+        en_text = "The length of the rate mustn't exceed 15 characters. Try again"
         text = ru_text if teacher.language_code == 'ru' else en_text
         bot.send_message(message.chat.id,
                          text,
@@ -60,7 +60,7 @@ def submission_assessment_receive(message, submission_id):
         submission.save()
 
         ru_text = "Результат проверки отправлен ученику"
-        en_text = None
+        en_text = "The review result has been sent to the student"
         text = ru_text if teacher.language_code == 'ru' else en_text
 
         bot.send_message(message.chat.id,

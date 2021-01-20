@@ -23,7 +23,7 @@ def task_list_view(user, classroom, message_to_edit=None):
 
 def task_detail_view(user, task, message_to_edit=None):
     text = f'*{task.name}*' if \
-        type(user) is Teacher else f'*{task.name}*. {STATUS_BADGES[user.get_task_status(task.id)]}'
+        type(user) is Teacher else f'*{task.name}*. {STATUS_BADGES[user.get_task_status(task.id)][user.language_code]}'
 
     if message_to_edit:
         bot.edit_message_text(
@@ -41,7 +41,7 @@ def task_detail_view(user, task, message_to_edit=None):
 
 
 def task_message_list_view(user, task):
-    text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else 'Content of the task: *{task.name}*'
+    text = f"Содержание задания: *{task.name}*" if user.language_code == 'ru' else f"Content of the task: *{task.name}*"
     bot.send_message(user.id, text, parse_mode='Markdown')
     for task_message in task.messages:
         bot.forward_message(user.id, task_message.teacher_id, task_message.message_id)
@@ -69,8 +69,13 @@ def submission_message_list_view(user, submission, task):
     student = Student.get(submission.student_id)
 
     text = f"Выполненное задание: *{task.name}*. Ученик: _{student.fullname}_" if \
-        user.language_code == 'ru' else 'Submission: *{task.name}*. Student: _{student.fullname}_'
+        user.language_code == 'ru' else f"Submission: *{task.name}*. Student: _{student.fullname}_"
     bot.send_message(user.id, text, parse_mode='Markdown')
+
+    ru_text = "Нажмите, чтобы исправить ошибки 👇🏻"
+    en_text = "Tap to review 👇🏻"
+    text = ru_text if user.language_code == 'ru' else en_text
+
     for submission_message in submission.messages:
         message = bot.forward_message(user.id, submission_message.student_id, submission_message.message_id)
         if type(user) is Teacher and message.photo:
@@ -81,16 +86,17 @@ def submission_message_list_view(user, submission, task):
             )
             bot.send_message(
                 user.id,
-                'Нажмите, чтобы исправить ошибки👇🏻',  # TODO add English
-                reply_markup=get_drawer_markup(message.photo[-1].file_id, message.chat.id,
+                text,
+                reply_markup=get_drawer_markup(message.photo[-1].file_id, user,
                                                message_with_button.message_id, submission.id)
             )
 
 
 def submission_review_result_view(user, submission, task):
     ru_text = f"Задание: *{task.name}*\nОценка: *{submission.assessment}*\n\n" \
-              f"Комментарии учителя👇🏻"
-    en_text = None
+              f"Комментарии учителя 👇🏻"
+    en_text = f"Task: *{task.name}*\nRate: *{submission.assessment}*\n\n" \
+              f"Teacher's comments 👇🏻"
     text = ru_text if user.language_code == 'ru' else en_text
     bot.send_message(user.id, text, parse_mode='Markdown')
 
@@ -99,4 +105,4 @@ def submission_review_result_view(user, submission, task):
         for review_message in review_messages:
             bot.forward_message(user.id, review_message.teacher_id, message_id=review_message.message_id)
     else:
-        bot.send_message(user.id, 'Нет комментария')  # TODO add English
+        bot.send_message(user.id, "Нет комментария" if user.language_code == 'ru' else "No comment")

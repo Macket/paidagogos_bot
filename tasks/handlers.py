@@ -113,10 +113,10 @@ def handle_new_submission_query(call):
 
     ru_text = "Отправьте мне выполненное задание в любом формате: " \
               "текст, фото, видео, файлы или аудиосообщения; одним или несколькими сообщениями."
-    en_text = None
+    en_text = "Send me the submission in any format: " \
+              "text, photo, video, files or audio messages; one or more messages."
     text = ru_text if student.language_code == 'ru' else en_text
 
-    bot.send_message(call.message.chat.id,
-                     text,
-                     parse_mode='Markdown')
+    bot.send_message(call.message.chat.id, text, parse_mode='Markdown')
+
     bot.register_next_step_handler(call.message, create_submission_scenario.compose_submission, submission)

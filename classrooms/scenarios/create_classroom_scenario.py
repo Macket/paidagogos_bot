@@ -8,8 +8,8 @@ from classrooms.views import classroom_link_view, classroom_list_view
 def classroom_name_request(message):
     teacher = Teacher.get(message.chat.id)
 
-    ru_text = f"Отправьте название класса"
-    en_text = None
+    ru_text = "Отправьте название класса"
+    en_text = "Send the name of the classroom"
     text = ru_text if teacher.language_code == 'ru' else en_text
 
     bot.send_message(message.chat.id, text)

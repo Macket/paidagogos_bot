@@ -289,7 +289,6 @@ class SubmissionStatus(Enum):
     REVIEWED = 'REVIEWED'
 
 
-# TODO add English
 STATUS_ICONS = {
     'NONE': '🔔',
     'DRAFT': '✍️',
@@ -297,10 +296,9 @@ STATUS_ICONS = {
     'REVIEWED': '✅',
 }
 
-# TODO add English
 STATUS_BADGES = {
-    'NONE': '🔔 Не сдано',
-    'DRAFT': '✍️ Черновик',
-    'REVIEW': '⏳ На проверке',
-    'REVIEWED': '✅ Проверено',
+    'NONE': {'ru': '🔔 Не сдано', 'en': '🔔 Not submitted'},
+    'DRAFT': {'ru': '✍️ Черновик', 'en': '✍️ Draft'},
+    'REVIEW': {'ru': '⏳ На проверке', 'en': '⏳ Review'},
+    'REVIEWED': {'ru': '✅ Проверено', 'en': '✅ Reviewed'},
 }
